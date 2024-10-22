@@ -7,8 +7,13 @@
 
 
 需要用到以下，去優化你的模型，此模型是用CNN進行CIFAR-10資料集 、使用Pytorch機器學習庫
+
 Data Augmentation
+
 L1 or L2 Regularization
+
 Dropout
+
 Batch Normalization
+
 EarlyStopping
