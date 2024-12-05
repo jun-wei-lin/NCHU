@@ -13,7 +13,7 @@
 ---
 
 ## 流程說明
-
+![流程](https://github.com/jun-wei-lin/NCHU/blob/main/Digital-Image-%20Processing/Hw1_%E5%BD%B1%E5%83%8F%E6%8B%BC%E6%8E%A5/Hw1_%E5%BD%B1%E5%83%8F%E6%8B%BC%E6%8E%A5_%E6%B5%81%E7%A8%8B.png?raw=true)
 ### 1. 載入影像
 - 因為影像存儲於 GitHub 中，我們先對 URL 的影像進行下載與預處理。
 - 轉換為灰階圖像（供 SIFT 使用）及彩色圖像（供可視化處理）。
