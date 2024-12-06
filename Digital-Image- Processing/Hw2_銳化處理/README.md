@@ -98,9 +98,5 @@ show_images([total_kp], ['V.S.'])
 您可以根據需求選擇合適的銳化方法，並在專案中進行實驗。
 
 ## 5. 參考資料
-- OpenCV 官方文檔: https://docs.opencv.org/
-- 相關的影像處理書籍與資源，如 "Digital Image Processing" by Rafael C. Gonzalez 和 Richard E. Woods。
-
----
-
-這是您專案的完整流程與說明，並包含了如何執行每個步驟及其背後的邏輯。希望這對您有所幫助！
+- [【影像處理】非銳化濾鏡 Unsharp Masking](https://jason-chen-1992.weebly.com/home/-unsharp-masking)
+- [Nick.NCHU.DIP Public 非銳化濾鏡 Unsharp Masking](https://github.com/nicktien007/Nick.NCHU.DIP?tab=readme-ov-file)
