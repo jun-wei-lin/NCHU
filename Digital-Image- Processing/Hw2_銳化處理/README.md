@@ -12,6 +12,9 @@ pip install opencv-python-headless matplotlib
 ```
 
 ## 2. 流程簡介
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jun-wei-lin/NCHU/refs/heads/main/Digital-Image-%20Processing/Hw2_%E9%8A%B3%E5%8C%96%E8%99%95%E7%90%86/Hw2_%E6%B5%81%E7%A8%8B%E5%9C%96drawio.png" alt="Example Image">
+</p>
 
 ### 步驟 1: 讀取影像
 首先，載入影像並轉換為灰階影像，這有助於簡化後續處理，避免色彩信息影響銳化結果。
