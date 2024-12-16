@@ -59,9 +59,3 @@ url = "https://example.com/your_image.jpg"
 ```
 
 在 Python 環境中執行程式，即可產生視覺化結果。
-
----
-
-## 授權
-
-本專案採用 MIT 授權條款，歡迎自由使用與修改。
