@@ -1,6 +1,0 @@
-streamlit
-ckiptagger
-wordcloud
-requests
-beautifulsoup4
-tensorflow==2.1.0
