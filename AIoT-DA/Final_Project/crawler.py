@@ -49,7 +49,7 @@ def scrape_ptt(keyword, period):
                                 content = re.sub(r"(作者|看板|標題|時間).*?:", "", content)  # 移除無效元數據
                                 content = content.strip()  # 去掉首尾空格
                                 # 限制內容長度
-                                content = content[:2000]  # 限制為前 2000 字
+                                content = content[:1500]  # 限制為前 1500 字
                                 articles.append(content)
                         else:
                             return articles
