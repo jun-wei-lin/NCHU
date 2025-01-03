@@ -40,9 +40,9 @@ def scrape_ptt(keyword, period):
                     continue  # 遇到無效日期時跳過
 
         next_page = soup.find('a', string="‹ 上頁")
-        if next_page:
+        if next_page and 'href' in next_page.attrs:
             url = base_url + next_page['href']
         else:
-            break
+            url = None
 
     return article_list
