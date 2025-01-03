@@ -1,6 +1,7 @@
 from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm  # 匯入字體管理
 import os  # 確保匯入 os 模組
 
 def prepare_data(data):
