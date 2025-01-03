@@ -25,7 +25,7 @@ if option == "情感分析":
     period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)  # 限制最大值為 12 個月
     max_articles = 100  # 固定最大抓取文章數量為 100 篇
 
-  if st.button("開始分析"):
+if st.button("開始分析"):
     from modules.sentiment_analysis import analyze_sentiment
     from crawler import scrape_ptt
 
