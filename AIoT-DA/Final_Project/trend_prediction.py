@@ -18,19 +18,28 @@ def train_arima_model(data, order=(1, 1, 1)):
 
 def predict_trends(fit, steps=30):
     """預測未來趨勢並返回置信區間."""
-    forecast_obj = fit.get_forecast(steps=steps)
-    forecast_mean = forecast_obj.predicted_mean
-    forecast_ci = forecast_obj.conf_int()
+    try:
+        forecast_obj = fit.get_forecast(steps=steps)
+        forecast_mean = forecast_obj.predicted_mean
+        forecast_ci = forecast_obj.conf_int()
 
-    # 構造預測結果 DataFrame
-    forecast_index = pd.date_range(fit.data.dates[-1], periods=steps + 1, freq="D")[1:]
-    forecast_df = pd.DataFrame({
-        "forecast": forecast_mean,
-        "lower_bound": forecast_ci.iloc[:, 0],
-        "upper_bound": forecast_ci.iloc[:, 1]
-    }, index=forecast_index)
-    
-    return forecast_df
+        # 檢查內容
+        print("Forecast Mean:", forecast_mean)
+        print("Confidence Interval:", forecast_ci)
+
+        # 構造預測結果 DataFrame
+        forecast_index = pd.date_range(fit.data.dates[-1], periods=steps + 1, freq="D")[1:]
+        forecast_df = pd.DataFrame({
+            "forecast": forecast_mean,
+            "lower_bound": forecast_ci.iloc[:, 0],
+            "upper_bound": forecast_ci.iloc[:, 1]
+        }, index=forecast_index)
+
+        return forecast_df
+    except Exception as e:
+        print(f"預測過程中出現錯誤: {e}")
+        return None
+
 
 def plot_trends(data, forecast, font_path):
     """繪製改進後的趨勢圖並支持中文標籤."""
