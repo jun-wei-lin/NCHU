@@ -3,5 +3,5 @@ ckiptagger
 wordcloud
 requests
 beautifulsoup4
-tensorflow
+tensorflow==2.18.0
 python-dateutil
