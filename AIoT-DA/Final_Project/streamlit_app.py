@@ -20,24 +20,28 @@ elif option == "情感分析":
      # 使用者輸入
     keyword = st.text_input("請輸入關鍵字：")
     period = st.number_input("搜尋期間（月）", min_value=1, value=3)
-    
-    if st.button("開始分析"):
-        from modules.sentiment_analysis import analyze_sentiment
-        from crawler import scrape_ptt
+   if st.button("開始分析"):
+    from modules.sentiment_analysis import analyze_sentiment
+    from crawler import scrape_ptt
 
-        # 爬取文章
-        st.write("正在抓取文章內容...")
-        links = scrape_ptt(keyword, period)
-        articles = [link["content"] for link in links]  # 假設抓取內容
+    # 爬取文章內容
+    st.write("正在抓取文章內容...")
+    articles = scrape_ptt(keyword, period)
 
+    # 檢查爬取結果
+    if not articles:
+        st.write("未找到相關文章")
+    else:
         # 分析情感
         st.write("正在分析情感...")
         sentiment_results = analyze_sentiment(articles)
 
         # 展示結果
         st.write("分析結果：")
-        for result in sentiment_results:
-            st.json(result)
+        for article, sentiment in zip(articles, sentiment_results):
+            st.write(f"文章內容：{article[:50]}...")  # 顯示前50字
+            st.json(sentiment)
+
 elif option == "趨勢預測":
     st.title("趨勢預測模組")
     st.write("此模組將分析熱門關鍵字的趨勢並進行未來預測。")
