@@ -16,32 +16,53 @@ if option == "首頁":
     st.title("智慧社群洞察與熱門話題分析平台")
     st.write("歡迎使用本平台！這裡提供基於 PTT 熱門話題的智能分析與趨勢預測工具。")
 elif option == "情感分析":
-    st.title("情感分析模組")
+   st.title("情感分析模組")
     st.write("此模組將分析 PTT 文章的情感傾向（正面、中立、負面）。")
-     # 使用者輸入
+    # 使用者輸入
     keyword = st.text_input("請輸入關鍵字：")
     period = st.number_input("搜尋期間（月）", min_value=1, value=3)
-if st.button("開始分析"):
-    from modules.sentiment_analysis import analyze_sentiment
-    from crawler import scrape_ptt
 
-    # 爬取文章內容
-    st.write("正在抓取文章內容...")
-    articles = scrape_ptt(keyword, period)
+    if st.button("開始分析"):
+        from modules.sentiment_analysis import analyze_sentiment
+        from crawler import scrape_ptt
 
-    if not articles:
-        st.write("未找到相關文章")
-    else:
-        st.write(f"總共抓取到 {len(articles)} 篇文章")
-        # 分析情感
-        try:
-            sentiment_results = analyze_sentiment(articles)
-            st.write("分析結果：")
-            for article, sentiment in zip(articles, sentiment_results):
-                st.write(f"文章內容：{article[:50]}...")  # 顯示前 50 字
-                st.json(sentiment)
-        except ValueError as e:
-            st.error(f"錯誤：{e}")
+        # 爬取文章內容
+        st.write("正在抓取文章內容...")
+        articles = scrape_ptt(keyword, period)
+
+        if not articles:
+            st.write("未找到相關文章")
+        else:
+            st.write(f"總共抓取到 {len(articles)} 篇文章")
+            try:
+                # 分析情感
+                st.write("正在分析情感...")
+                sentiment_results = analyze_sentiment(articles)
+                
+                # 顯示情感分析結果
+                st.write("分析結果：")
+                for article, sentiment in zip(articles, sentiment_results):
+                    st.write(f"文章內容：{article[:50]}...")  # 顯示前 50 字
+                    st.json(sentiment)
+
+                # 統計情感分佈
+                st.write("情感分佈統計：")
+                labels = [result["label"] for result in sentiment_results]
+                label_counts = {label: labels.count(label) for label in set(labels)}
+                
+                for label, count in label_counts.items():
+                    st.write(f"{label}: {count} 篇")
+
+                # 繪製柱狀圖
+                fig, ax = plt.subplots()
+                ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red'])
+                ax.set_title("情感分佈")
+                ax.set_xlabel("情感類別")
+                ax.set_ylabel("文章數量")
+                st.pyplot(fig)
+
+            except ValueError as e:
+                st.error(f"錯誤：{e}")
 
 
 elif option == "趨勢預測":
