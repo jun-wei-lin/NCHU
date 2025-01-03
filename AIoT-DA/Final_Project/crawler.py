@@ -21,7 +21,8 @@ def scrape_ptt(keyword, period, max_articles=100):
     now_time = datetime.now() - relativedelta(months=period)
     cookies = {'over18': '1'}
     articles = []
-
+    links = []
+    
     while url and len(articles) < max_articles:
         try:
             web = requests.get(url, cookies=cookies)
@@ -56,9 +57,9 @@ def scrape_ptt(keyword, period, max_articles=100):
                                 # 只保留包含關鍵字的文章
                                 if keyword in content:
                                     articles.append(content)
-
+                                    links.append(link)  # 保存連結
                         else:
-                            return articles
+                            return articles, links
                     except ValueError:
                         continue  # 日期解析錯誤，跳過該文章
 
