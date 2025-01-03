@@ -118,6 +118,10 @@ elif option == "趨勢預測":
                 # 顯示結果
                 st.write("未來 30 天的趨勢預測：")
                 st.line_chart(forecast)
+                
+                current_dir = os.path.dirname(__file__)
+                font_path = os.path.join(current_dir, "fonts", "kaiu.ttf")  # 使用絕對路徑
+                
                 fig = plot_trends(prepared_data, forecast, font_path=font_path)
                 st.pyplot(fig)
                 
