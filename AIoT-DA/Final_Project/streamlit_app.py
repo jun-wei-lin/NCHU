@@ -32,9 +32,6 @@ if st.button("開始分析"):
         st.write("未找到相關文章")
     else:
         st.write(f"總共抓取到 {len(articles)} 篇文章")
-        for i, article in enumerate(articles):
-            st.write(f"文章 {i+1} 原始長度（字元數）：{len(article)}")
-        
         # 分析情感
         try:
             sentiment_results = analyze_sentiment(articles)
