@@ -16,7 +16,7 @@ if option == "首頁":
     st.title("智慧社群洞察與熱門話題分析平台")
     st.write("歡迎使用本平台！這裡提供基於 PTT 熱門話題的智能分析與趨勢預測工具。")
 elif option == "情感分析":
-   st.title("情感分析模組")
+    st.title("情感分析模組")
     st.write("此模組將分析 PTT 文章的情感傾向（正面、中立、負面）。")
     # 使用者輸入
     keyword = st.text_input("請輸入關鍵字：")
