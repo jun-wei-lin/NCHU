@@ -22,12 +22,19 @@ elif option == "情感分析":
     keyword = st.text_input("請輸入關鍵字：")
     period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)  # 限制最大值為 12 個月
     max_articles = 100  # 固定最大抓取文章數量為 100 篇
+if option == "情感分析":
+    st.title("情感分析模組")
+    st.write("此模組將分析 PTT 文章的情感傾向（正面、中立、負面）。")
     
+    # 使用者輸入
+    keyword = st.text_input("請輸入關鍵字：")
+    period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)  # 限制最大值為 12 個月
+    max_articles = 100  # 固定最大抓取文章數量為 100 篇
+
     if st.button("開始分析"):
         from modules.sentiment_analysis import analyze_sentiment
         from crawler import scrape_ptt
 
-        # 爬取文章內容
         st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
         articles = scrape_ptt(keyword, period, max_articles)
 
@@ -39,22 +46,17 @@ elif option == "情感分析":
                 # 分析情感
                 st.write("正在分析情感...")
                 sentiment_results = analyze_sentiment(articles)
-                
-                # 顯示情感分析結果
-                st.write("分析結果：")
-                # 顯示一篇文章的情感分析結果
-                st.write(f"文章內容：{articles[0][:100]}...")  # 顯示前 100 字
-                st.json(sentiment_results[0])
-                
+
                 # 統計情感分佈
                 st.write("情感分佈統計：")
                 labels = [result["label"] for result in sentiment_results]
                 label_counts = {label: labels.count(label) for label in set(labels)}
-                
+
                 for label, count in label_counts.items():
                     st.write(f"{label}: {count} 篇")
 
                 # 繪製柱狀圖
+                import matplotlib.pyplot as plt
                 fig, ax = plt.subplots()
                 ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red', 'blue'])
                 ax.set_title("情感分佈")
@@ -62,8 +64,21 @@ elif option == "情感分析":
                 ax.set_ylabel("文章數量")
                 st.pyplot(fig)
 
+                # 展示每種情感標籤的文章三篇
+                st.write("展示各情感類別的文章：")
+                for label in label_counts.keys():
+                    st.write(f"**{label} 類文章**（展示三篇）:")
+                    displayed_articles = [articles[i][:100] for i, result in enumerate(sentiment_results) if result["label"] == label][:3]
+                    if not displayed_articles:
+                        st.write("無符合條件的文章")
+                    else:
+                        for i, article in enumerate(displayed_articles):
+                            st.write(f"文章 {i+1}: {article}...")
+                            st.json(sentiment_results[articles.index(article)])
+
             except ValueError as e:
                 st.error(f"錯誤：{e}")
+
 
 
 elif option == "趨勢預測":
