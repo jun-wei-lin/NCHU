@@ -28,19 +28,20 @@ if st.button("開始分析"):
     st.write("正在抓取文章內容...")
     articles = scrape_ptt(keyword, period)
 
-    # 檢查爬取結果
+    # 確保爬取結果有效
     if not articles:
         st.write("未找到相關文章")
     else:
         # 分析情感
         st.write("正在分析情感...")
-        sentiment_results = analyze_sentiment(articles)
-
-        # 展示結果
-        st.write("分析結果：")
-        for article, sentiment in zip(articles, sentiment_results):
-            st.write(f"文章內容：{article[:50]}...")  # 顯示前50字
-            st.json(sentiment)
+        try:
+            sentiment_results = analyze_sentiment(articles)
+            st.write("分析結果：")
+            for article, sentiment in zip(articles, sentiment_results):
+                st.write(f"文章內容：{article[:50]}...")  # 顯示前50字
+                st.json(sentiment)
+        except ValueError as e:
+            st.error(f"錯誤：{e}")
 
 elif option == "趨勢預測":
     st.title("趨勢預測模組")
