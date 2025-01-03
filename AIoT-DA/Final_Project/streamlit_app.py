@@ -56,24 +56,23 @@ if option == "情感分析":
                 for label, count in label_counts.items():
                     st.write(f"{label}: {count} 篇")
                     
-               # 獲取 Streamlit 運行環境的工作目錄
+                # 獲取字體文件的相對路徑
                 current_dir = os.path.dirname(__file__)
                 font_path = os.path.join(current_dir, "fonts", "kaiu.ttf")  # 字體文件相對路徑
-                
-                # 檢查字體文件是否存在
+
+                # 確認字體文件是否存在
                 if not os.path.exists(font_path):
                     raise FileNotFoundError(f"字體文件未找到，請確認路徑是否正確：{font_path}")
-                
+
                 # 加載字體
                 my_font = fm.FontProperties(fname=font_path)
-
-                # 繪製柱狀圖
-                import matplotlib.pyplot as plt
+        
+               # 繪製柱狀圖
                 fig, ax = plt.subplots()
                 ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red', 'blue'])
-                ax.set_title("情感分佈")
-                ax.set_xlabel("情感類別")
-                ax.set_ylabel("文章數量")
+                ax.set_title("情感分佈", fontproperties=my_font)
+                ax.set_xlabel("情感類別", fontproperties=my_font)
+                ax.set_ylabel("文章數量", fontproperties=my_font)
                 st.pyplot(fig)
 
                 # 展示各種情感標籤的文章三篇
