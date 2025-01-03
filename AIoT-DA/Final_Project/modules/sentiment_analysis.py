@@ -1,4 +1,4 @@
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer
 
 def analyze_sentiment(articles):
     """
@@ -10,13 +10,18 @@ def analyze_sentiment(articles):
     Returns:
         list: 每篇文章的情感標籤及分數
     """
-    # 初始化情感分析管道
+    # 初始化模型與分詞器
     sentiment_pipeline = pipeline("sentiment-analysis", framework="pt")
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
 
-    # 檢查輸入是否為文本列表
-    if not isinstance(articles, list) or not all(isinstance(article, str) for article in articles):
-        raise ValueError("輸入應為包含字符串的列表 (List[str])")
+    results = []
+    for article in articles:
+        # 使用分詞器對文本進行截斷
+        truncated_text = tokenizer.decode(
+            tokenizer.encode(article, truncation=True, max_length=512)
+        )
+        # 分析情感
+        sentiment = sentiment_pipeline(truncated_text)[0]
+        results.append(sentiment)
 
-    # 分析情感
-    results = sentiment_pipeline(articles)
     return results
