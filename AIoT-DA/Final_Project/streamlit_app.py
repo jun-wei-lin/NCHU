@@ -91,19 +91,17 @@ if option == "情感分析":
             except ValueError as e:
                 st.error(f"錯誤：{e}")
 
-
 elif option == "趨勢預測":
     st.title("趨勢預測模組")
     st.write("此模組將分析熱門關鍵字的趨勢並進行未來預測。")
-# 爬取數據
-    from crawler import scrape_keyword_trends  # 假設爬蟲模組包含趨勢數據抓取功能
-    from trend_prediction import prepare_data, train_prophet_model, predict_trends, plot_trends
+    
+    from crawler import scrape_keyword_trends
+    from trend_prediction import prepare_data, train_arima_model, predict_trends, plot_trends
     
     keyword = st.text_input("請輸入關鍵字進行趨勢分析：")
     if st.button("開始趨勢預測"):
         st.write("正在爬取數據...")
         
-        # 假設爬取的數據為 DataFrame 格式，包含 `date` 和 `value`
         trend_data = scrape_keyword_trends(keyword)
         if trend_data.empty:
             st.write("未找到相關數據，請嘗試其他關鍵字。")
@@ -114,16 +112,17 @@ elif option == "趨勢預測":
             # 預測趨勢
             try:
                 prepared_data = prepare_data(trend_data)
-                model = train_prophet_model(prepared_data)
-                forecast = predict_trends(model, periods=30)
+                model = train_arima_model(prepared_data, order=(1, 1, 1))
+                forecast = predict_trends(model, steps=30)
 
                 # 顯示結果
                 st.write("未來 30 天的趨勢預測：")
-                st.write(forecast.tail())
+                st.line_chart(forecast)
                 st.pyplot(plot_trends(prepared_data, forecast))
 
             except Exception as e:
                 st.error(f"趨勢預測過程中出現錯誤：{e}")
+
 
 elif option == "用戶行為分析":
     st.title("用戶行為分析模組")
