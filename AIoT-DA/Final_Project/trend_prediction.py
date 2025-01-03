@@ -1,6 +1,7 @@
 from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 import matplotlib.pyplot as plt
+import os  # 確保匯入 os 模組
 
 def prepare_data(data):
     """清理並準備數據."""
