@@ -20,7 +20,10 @@ def predict_trends(fit, steps=30):
     forecast = fit.forecast(steps=steps)
     return forecast
 
-def plot_trends(data, forecast, font_path="fonts/kaiu.ttf"):
+current_dir = os.path.dirname(__file__)
+font_path = os.path.join(current_dir, "fonts", "kaiu.ttf")  # 使用絕對路徑
+
+def plot_trends(data, forecast, font_path):
     """繪製趨勢圖並支持中文標籤."""
     # 加載字體
     if not font_path or not os.path.exists(font_path):
