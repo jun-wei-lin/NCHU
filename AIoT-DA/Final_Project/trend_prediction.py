@@ -21,3 +21,22 @@ def predict_trends(fit, steps=30):
     forecast = fit.forecast(steps=steps)
     return forecast
 
+def plot_trends(data, forecast, font_path):
+    """繪製趨勢圖並支持中文標籤."""
+    # 加載字體
+    my_font = fm.FontProperties(fname=font_path)
+
+    # 繪圖
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(data.index, data['value'], label="歷史數據", linestyle='-', marker='o', color='blue')
+    forecast_index = pd.date_range(data.index[-1], periods=len(forecast)+1, freq="D")[1:]
+    ax.plot(forecast_index, forecast, label="預測數據", linestyle='--', marker='x', color='orange')
+
+    # 中文標籤
+    ax.legend(prop=my_font, loc="upper left")
+    ax.set_title("趨勢預測", fontproperties=my_font, fontsize=16)
+    ax.set_xlabel("日期", fontproperties=my_font, fontsize=12)
+    ax.set_ylabel("文章數量", fontproperties=my_font, fontsize=12)
+    ax.grid(True, linestyle='--', alpha=0.7)
+
+    return fig
