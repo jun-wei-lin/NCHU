@@ -51,8 +51,8 @@ def scrape_ptt(keyword, period, max_articles=100):
                                 content = content.strip()  # 去掉首尾空格
                                 
                                 # 限制內容長度
-                                content = content[:1500]  # 限制為前 1500 字符
-                                
+                                content = content[:1500]  # 限制文章字符長度，避免超長文本
+
                                 # 只保留包含關鍵字的文章
                                 if keyword in content:
                                     articles.append(content)
