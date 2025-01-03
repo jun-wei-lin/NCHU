@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import re
+import pandas as pd
 
 def scrape_ptt(keyword, period, max_articles=100):
     """
@@ -78,3 +79,61 @@ def scrape_ptt(keyword, period, max_articles=100):
             break
 
     return articles[:max_articles], links[:max_articles]  # **(更新：返回兩個列表且限制數量)**
+
+
+def scrape_keyword_trends(keyword):
+    """
+    爬取 PTT 八卦板關鍵字的每日文章數據，用於趨勢分析。
+
+    Args:
+        keyword (str): 搜尋關鍵字
+
+    Returns:
+        pd.DataFrame: 包含日期和文章數的 DataFrame
+    """
+    base_url = "https://www.ptt.cc"
+    url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
+    cookies = {'over18': '1'}
+    trends = {}
+
+    while url:
+        try:
+            web = requests.get(url, cookies=cookies)
+            web.raise_for_status()
+            soup = BeautifulSoup(web.text, "html.parser")
+            titles = soup.find_all('div', class_='title')
+            dates = soup.find_all('div', class_='date')
+
+            for i in range(len(titles)):
+                if titles[i].find('a'):  # 確保有連結
+                    date_text = dates[i].get_text().strip()
+                    try:
+                        article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
+                        date_str = article_date.strftime("%Y-%m-%d")
+                        if date_str in trends:
+                            trends[date_str] += 1
+                        else:
+                            trends[date_str] = 1
+                    except ValueError:
+                        continue  # 日期解析錯誤，跳過該文章
+
+            next_page = soup.find('a', string="‹ 上頁")
+            if next_page and 'href' in next_page.attrs:
+                url = base_url + next_page['href']
+            else:
+                break
+
+        except requests.RequestException as e:
+            print(f"HTTP 請求錯誤：{e}")
+            break
+        except Exception as e:
+            print(f"其他錯誤：{e}")
+            break
+
+    # 將結果轉換為 DataFrame
+    trend_data = pd.DataFrame(list(trends.items()), columns=["date", "value"])
+    trend_data["date"] = pd.to_datetime(trend_data["date"])
+    trend_data.sort_values(by="date", inplace=True)
+    return trend_data
+
+
