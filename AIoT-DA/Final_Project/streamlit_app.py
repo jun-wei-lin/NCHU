@@ -83,9 +83,6 @@ if option == "情感分析":
                         if result["label"] == label and count < 3:
                             st.write(f"文章 {count+1}：{articles[i][:100]}...")  # 顯示前 100 字
                             st.json(result)  # 顯示情感分析結果
-                            st.write("分析解釋：")
-                            for detail in result["details"]:
-                                st.write(f"- {detail['label']}: {detail['score']:.2f}")
                             st.markdown(f"<span style='color:blue; font-weight:bold;'>[查看原文]({links[i]})</span>", unsafe_allow_html=True)  # 提供原文連結，使用樣式
                             count += 1
                     if count == 0:
