@@ -11,7 +11,7 @@ def analyze_sentiment(articles):
         list: 每篇文章的情感標籤及分數
     """
     # 初始化情感分析管道，啟用自動截斷
-    sentiment_pipeline = pipeline("sentiment-analysis", framework="pt", truncation=True)
+    sentiment_pipeline = pipeline("sentiment-analysis", model="uer/roberta-base-finetuned-jd-binary-chinese", framework="pt", truncation=True)
 
     # 確保輸入是字符串列表
     if not isinstance(articles, list) or not all(isinstance(article, str) for article in articles):
