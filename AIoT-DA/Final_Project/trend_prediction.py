@@ -16,6 +16,19 @@ def train_arima_model(data, order=(1, 1, 1)):
     fit = model.fit()
     return fit
 
+def predict_trends(fit, steps=30):
+    """預測未來趨勢並返回整數結果."""
+    try:
+        forecast = fit.forecast(steps=steps)
+        if forecast is None or len(forecast) == 0:
+            raise ValueError("預測結果為空，請檢查模型訓練數據。")
+        
+        # 將預測結果轉換為整數
+        forecast = forecast.round().astype(int)
+        return forecast
+    except Exception as e:
+        raise ValueError(f"預測過程中出現錯誤: {e}")
+
 def plot_trends(data, forecast, font_path):
     """繪製改進後的趨勢圖並支持中文標籤."""
     my_font = fm.FontProperties(fname=font_path)
