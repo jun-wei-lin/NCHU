@@ -10,17 +10,11 @@ def prepare_data(data):
     data.set_index('date', inplace=True)
     return data
 
-def train_arima_model(data, order=(2, 1, 2)):
+def train_arima_model(data, order=(1, 1, 1)):
     """訓練 ARIMA 模型."""
-    if len(data['value']) < max(order) + 1:
-        raise ValueError(f"數據點不足以支持 ARIMA 模型（至少需要 {max(order) + 1} 條數據）")
-    try:
-        model = ARIMA(data['value'], order=order)
-        fit = model.fit()
-        return fit
-    except Exception as e:
-        raise ValueError(f"ARIMA 模型訓練失敗: {e}")
-
+    model = ARIMA(data['value'], order=(2, 1, 2))  # 更高階的模型
+    fit = model.fit()
+    return fit
 
 def predict_trends(fit, steps=30):
     """預測未來趨勢."""
