@@ -50,7 +50,8 @@ def scrape_ptt(keyword, period, max_articles=100):
                                 articles_with_links.append((content, link))
 
                         else:
-                            return articles_with_links
+                           return articles_with_links[:max_articles]  # 確保返回 [(文章內容, 原文連結), ...]
+
                     except ValueError:
                         continue  # 日期解析錯誤，跳過該文章
 
