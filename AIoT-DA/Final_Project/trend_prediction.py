@@ -12,9 +12,15 @@ def prepare_data(data):
 
 def train_arima_model(data, order=(1, 1, 1)):
     """訓練 ARIMA 模型."""
-    model = ARIMA(data['value'], order=(2, 1, 2))  # 更高階的模型
-    fit = model.fit()
-    return fit
+    if len(data['value']) < max(order):
+        raise ValueError(f"數據點不足以支持 ARIMA({order}) 模型。")
+    try:
+        model = ARIMA(data['value'], order=order)
+        fit = model.fit()
+        return fit
+    except Exception as e:
+        raise ValueError(f"ARIMA 模型訓練失敗: {e}")
+
 
 def predict_trends(fit, steps=30):
     """預測未來趨勢並返回置信區間."""
