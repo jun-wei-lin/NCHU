@@ -14,9 +14,17 @@ def analyze_sentiment(articles):
     sentiment_pipeline = pipeline("sentiment-analysis", model="uer/roberta-base-finetuned-jd-binary-chinese", framework="pt")
     tokenizer = AutoTokenizer.from_pretrained("uer/roberta-base-finetuned-jd-binary-chinese")
 
+    # 確保所有文本為字符串
+    articles = [str(article) for article in articles]
+
     # 分詞並啟用截斷與填充
     encoded_inputs = tokenizer(articles, truncation=True, padding=True, max_length=512, return_tensors="pt")
-    
+    input_ids = encoded_inputs["input_ids"].tolist()  # 提取編碼後的 token id
+
     # 分析情感
-    results = sentiment_pipeline(encoded_inputs["input_ids"].tolist())
+    results = []
+    for ids in input_ids:
+        sentiment = sentiment_pipeline({"text": tokenizer.decode(ids, skip_special_tokens=True)})
+        results.append(sentiment[0])
+
     return results
