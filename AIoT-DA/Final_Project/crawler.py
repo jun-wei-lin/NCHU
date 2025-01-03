@@ -2,17 +2,18 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import re
 
 def scrape_ptt(keyword, period):
     """
-    爬取 PTT 八卦板文章內容。
+    爬取 PTT 八卦板文章內容，並進行文本清洗。
 
     Args:
         keyword (str): 搜尋關鍵字
         period (int): 搜尋期間（單位：月）
 
     Returns:
-        List[str]: 文章內容列表
+        List[str]: 清洗後的文章內容列表
     """
     base_url = "https://www.ptt.cc"
     url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
@@ -42,17 +43,19 @@ def scrape_ptt(keyword, period):
                             content_element = article_soup.find(id="main-container")
                             if content_element:
                                 content = content_element.text.split("--")[0]
-                                content = "".join(content.split())
+                                # 清洗文本
+                                content = re.sub(r"[^\w\s]", "", content)  # 移除標點符號
+                                content = re.sub(r"\s+", " ", content)  # 合併多餘空格
+                                content = re.sub(r"(作者|看板|標題|時間).*?:", "", content)  # 移除無效元數據
+                                content = content.strip()  # 去掉首尾空格
                                 # 限制內容長度
                                 content = content[:2000]  # 限制為前 2000 字
                                 articles.append(content)
                         else:
                             return articles
                     except ValueError:
-                        # 日期解析錯誤，跳過該文章
-                        continue
+                        continue  # 日期解析錯誤，跳過該文章
 
-            # 找到「‹ 上頁」按鈕
             next_page = soup.find('a', string="‹ 上頁")
             if next_page and 'href' in next_page.attrs:
                 url = base_url + next_page['href']
