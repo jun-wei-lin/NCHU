@@ -2,7 +2,7 @@ from transformers import pipeline, AutoTokenizer
 
 def analyze_sentiment(articles):
     """
-    使用情感分析管道分析文章的情感。
+    使用情感分析管道逐篇分析文章的情感。
 
     Args:
         articles (list): 文章內容列表
@@ -18,13 +18,10 @@ def analyze_sentiment(articles):
     for article in articles:
         # 使用分詞器進行截斷
         encoded_input = tokenizer(article, truncation=True, max_length=512, return_tensors="pt")
-        truncated_text = tokenizer.decode(encoded_input["input_ids"][0])
+        truncated_text = tokenizer.decode(encoded_input["input_ids"][0], skip_special_tokens=True)
         
         # 分析情感
         sentiment = sentiment_pipeline(truncated_text)[0]
-        
-        # 簡化標籤名稱
-        sentiment["label"] = sentiment["label"].split(" ")[0].upper()  # 保留 "NEGATIVE", "POSITIVE"
         results.append(sentiment)
 
     return results
