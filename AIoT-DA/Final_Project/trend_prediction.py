@@ -18,28 +18,27 @@ def train_arima_model(data, order=(1, 1, 1)):
 
 def predict_trends(fit, steps=30):
     """預測未來趨勢並返回置信區間."""
-    try:
-        forecast_obj = fit.get_forecast(steps=steps)
-        forecast_mean = forecast_obj.predicted_mean
-        forecast_ci = forecast_obj.conf_int()
+    forecast_obj = fit.get_forecast(steps=steps)
+    if forecast_obj is None:
+        raise ValueError("無法生成預測對象，檢查模型輸入數據。")
+    
+    forecast_mean = forecast_obj.predicted_mean
+    forecast_ci = forecast_obj.conf_int()
+    if forecast_ci is None or forecast_mean is None:
+        raise ValueError("預測置信區間或預測均值為空，檢查模型結果。")
 
-        # 檢查內容
-        print("Forecast Mean:", forecast_mean)
-        print("Confidence Interval:", forecast_ci)
+    # 構造預測結果 DataFrame
+    forecast_index = pd.date_range(fit.data.dates[-1], periods=steps + 1, freq="D")[1:]
+    if forecast_index is None:
+        raise ValueError("日期範圍生成失敗，檢查輸入數據。")
 
-        # 構造預測結果 DataFrame
-        forecast_index = pd.date_range(fit.data.dates[-1], periods=steps + 1, freq="D")[1:]
-        forecast_df = pd.DataFrame({
-            "forecast": forecast_mean,
-            "lower_bound": forecast_ci.iloc[:, 0],
-            "upper_bound": forecast_ci.iloc[:, 1]
-        }, index=forecast_index)
+    forecast_df = pd.DataFrame({
+        "forecast": forecast_mean,
+        "lower_bound": forecast_ci.iloc[:, 0],
+        "upper_bound": forecast_ci.iloc[:, 1]
+    }, index=forecast_index)
 
-        return forecast_df
-    except Exception as e:
-        print(f"預測過程中出現錯誤: {e}")
-        return None
-
+    return forecast_df
 
 def plot_trends(data, forecast, font_path):
     """繪製改進後的趨勢圖並支持中文標籤."""
