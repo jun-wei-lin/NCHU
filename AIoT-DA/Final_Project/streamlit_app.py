@@ -28,16 +28,13 @@ if st.button("開始分析"):
     st.write("正在抓取文章內容...")
     articles = scrape_ptt(keyword, period)
 
-    # 確保爬取結果有效
     if not articles:
         st.write("未找到相關文章")
     else:
         st.write(f"總共抓取到 {len(articles)} 篇文章")
-        
-        # 檢查文本長度
         for i, article in enumerate(articles):
-            st.write(f"文章 {i+1} 長度（字元數）：{len(article)}")
-
+            st.write(f"文章 {i+1} 原始長度（字元數）：{len(article)}")
+        
         # 分析情感
         try:
             sentiment_results = analyze_sentiment(articles)
