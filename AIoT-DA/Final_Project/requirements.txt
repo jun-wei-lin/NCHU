@@ -6,4 +6,4 @@ beautifulsoup4
 tensorflow
 python-dateutil
 transformers
-
+torch
