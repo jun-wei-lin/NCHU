@@ -33,7 +33,7 @@ def predict_trends(fit, steps=30):
         raise ValueError("預測置信區間或預測均值為空，檢查模型結果。")
 
     # 使用模型的最後一個日期作為起點
-    last_date = fit.data.dates[-1] if hasattr(fit.data, 'dates') and fit.data.dates is not None else fit.data.index[-1]
+    last_date = fit.model.data.orig_endog.index[-1]
     forecast_index = pd.date_range(last_date, periods=steps + 1, freq="D")[1:]
 
     forecast_df = pd.DataFrame({
@@ -43,6 +43,7 @@ def predict_trends(fit, steps=30):
     }, index=forecast_index)
 
     return forecast_df
+
 
 def plot_trends(data, forecast, font_path):
     """繪製改進後的趨勢圖並支持中文標籤."""
