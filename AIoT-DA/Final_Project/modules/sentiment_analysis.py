@@ -24,7 +24,16 @@ def analyze_sentiment(articles):
     # 分析情感
     results = []
     for ids in input_ids:
-        sentiment = sentiment_pipeline({"text": tokenizer.decode(ids, skip_special_tokens=True)})
-        results.append(sentiment[0])
+        try:
+            # 嘗試分析情感
+            sentiment = sentiment_pipeline({"text": tokenizer.decode(ids, skip_special_tokens=True)})
+            if sentiment and isinstance(sentiment, list) and len(sentiment) > 0:
+                results.append(sentiment[0])
+            else:
+                # 如果分析結果異常，加入空結果
+                results.append({"label": "UNKNOWN", "score": 0.0})
+        except Exception as e:
+            # 捕獲異常，加入錯誤標記
+            results.append({"label": "ERROR", "score": 0.0, "error": str(e)})
 
     return results
