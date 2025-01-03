@@ -20,15 +20,16 @@ elif option == "情感分析":
     st.write("此模組將分析 PTT 文章的情感傾向（正面、中立、負面）。")
     # 使用者輸入
     keyword = st.text_input("請輸入關鍵字：")
-    period = st.number_input("搜尋期間（月）", min_value=1, value=3)
-
+    period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)  # 限制最大值為 12 個月
+    max_articles = 100  # 固定最大抓取文章數量為 100 篇
+    
     if st.button("開始分析"):
         from modules.sentiment_analysis import analyze_sentiment
         from crawler import scrape_ptt
 
         # 爬取文章內容
-        st.write("正在抓取文章內容...")
-        articles = scrape_ptt(keyword, period)
+        st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
+        articles = scrape_ptt(keyword, period, max_articles)
 
         if not articles:
             st.write("未找到相關文章")
@@ -41,10 +42,10 @@ elif option == "情感分析":
                 
                 # 顯示情感分析結果
                 st.write("分析結果：")
-                for article, sentiment in zip(articles, sentiment_results):
-                    st.write(f"文章內容：{article[:50]}...")  # 顯示前 50 字
-                    st.json(sentiment)
-
+                # 顯示一篇文章的情感分析結果
+                st.write(f"文章內容：{articles[0][:100]}...")  # 顯示前 100 字
+                st.json(sentiment_results[0])
+                
                 # 統計情感分佈
                 st.write("情感分佈統計：")
                 labels = [result["label"] for result in sentiment_results]
@@ -55,7 +56,7 @@ elif option == "情感分析":
 
                 # 繪製柱狀圖
                 fig, ax = plt.subplots()
-                ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red'])
+                ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red', 'blue'])
                 ax.set_title("情感分佈")
                 ax.set_xlabel("情感類別")
                 ax.set_ylabel("文章數量")
