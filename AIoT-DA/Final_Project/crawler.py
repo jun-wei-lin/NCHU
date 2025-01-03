@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import re
 
-def scrape_ptt(keyword, period):
+def scrape_ptt(keyword, period, max_articles=100):
     """
     爬取 PTT 八卦板文章內容，並進行文本清洗。
 
@@ -50,7 +50,11 @@ def scrape_ptt(keyword, period):
                                 content = content.strip()  # 去掉首尾空格
                                 # 限制內容長度
                                 content = content[:1500]  # 限制為前 1500 字
-                                articles.append(content)
+
+                                # 只保留包含關鍵字的文章
+                                if keyword in content:
+                                    articles.append(content)
+                                
                         else:
                             return articles
                     except ValueError:
