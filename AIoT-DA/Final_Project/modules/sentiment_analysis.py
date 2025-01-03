@@ -12,7 +12,7 @@ def analyze_sentiment(articles):
     """
     # 初始化情感分析管道，啟用自動截斷
     sentiment_pipeline = pipeline("sentiment-analysis", model="uer/roberta-base-finetuned-jd-binary-chinese", framework="pt", truncation=True)
-     tokenizer = AutoTokenizer.from_pretrained("uer/roberta-base-finetuned-jd-binary-chinese")
+    tokenizer = AutoTokenizer.from_pretrained("uer/roberta-base-finetuned-jd-binary-chinese")
 
     results = []
     for article in articles:
