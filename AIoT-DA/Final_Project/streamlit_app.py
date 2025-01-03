@@ -30,18 +30,16 @@ if option == "情感分析":
     if st.button("開始分析"):
         from modules.sentiment_analysis import analyze_sentiment
         from crawler import scrape_ptt
-        from transformers import AutoTokenizer  # 新增 tokenizer
 
         st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
-        articles = scrape_ptt(keyword, period, max_articles)
+        articles_with_links = scrape_ptt(keyword, period, max_articles)  # 爬取文章，返回 (內容, 連結)
 
-        if not articles:
+        if not articles_with_links:
             st.write("未找到相關文章")
         else:
+            # 解壓返回結果為文章和連結
+            articles, links = zip(*articles_with_links)
             st.write(f"總共抓取到 {len(articles)} 篇文章")
-
-            # 初始化 tokenizer
-            tokenizer = AutoTokenizer.from_pretrained("uer/roberta-base-finetuned-jd-binary-chinese")
 
             try:
                 # 分析情感
@@ -55,27 +53,17 @@ if option == "情感分析":
 
                 for label, count in label_counts.items():
                     st.write(f"{label}: {count} 篇")
-                    
-                # 獲取字體文件的相對路徑
-                current_dir = os.path.dirname(__file__)
-                font_path = os.path.join(current_dir, "fonts", "kaiu.ttf")  # 字體文件相對路徑
 
-                # 確認字體文件是否存在
-                if not os.path.exists(font_path):
-                    raise FileNotFoundError(f"字體文件未找到，請確認路徑是否正確：{font_path}")
-
-                # 加載字體
-                my_font = fm.FontProperties(fname=font_path)
-        
-               # 繪製柱狀圖
+                # 繪製柱狀圖
+                import matplotlib.pyplot as plt
                 fig, ax = plt.subplots()
                 ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red', 'blue'])
-                ax.set_title("情感分佈", fontproperties=my_font)
-                ax.set_xlabel("情感類別", fontproperties=my_font)
-                ax.set_ylabel("文章數量", fontproperties=my_font)
+                ax.set_title("情感分佈")
+                ax.set_xlabel("情感類別")
+                ax.set_ylabel("文章數量")
                 st.pyplot(fig)
 
-                # 展示各種情感標籤的文章三篇
+                # 展示各情感類別的文章三篇
                 st.write("展示各情感類別的文章：")
                 for label in label_counts.keys():
                     st.write(f"**{label} 類文章**（展示三篇）：")
