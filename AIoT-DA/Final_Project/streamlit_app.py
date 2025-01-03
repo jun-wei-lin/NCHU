@@ -32,13 +32,18 @@ if st.button("開始分析"):
     if not articles:
         st.write("未找到相關文章")
     else:
+        st.write(f"總共抓取到 {len(articles)} 篇文章")
+        
+        # 檢查文本長度
+        for i, article in enumerate(articles):
+            st.write(f"文章 {i+1} 長度（字元數）：{len(article)}")
+
         # 分析情感
-        st.write("正在分析情感...")
         try:
             sentiment_results = analyze_sentiment(articles)
             st.write("分析結果：")
             for article, sentiment in zip(articles, sentiment_results):
-                st.write(f"文章內容：{article[:50]}...")  # 顯示前50字
+                st.write(f"文章內容：{article[:50]}...")  # 顯示前 50 字
                 st.json(sentiment)
         except ValueError as e:
             st.error(f"錯誤：{e}")
