@@ -20,7 +20,7 @@ elif option == "情感分析":
      # 使用者輸入
     keyword = st.text_input("請輸入關鍵字：")
     period = st.number_input("搜尋期間（月）", min_value=1, value=3)
-   if st.button("開始分析"):
+if st.button("開始分析"):
     from modules.sentiment_analysis import analyze_sentiment
     from crawler import scrape_ptt
 
