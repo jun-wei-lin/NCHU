@@ -81,12 +81,14 @@ def scrape_ptt(keyword, period, max_articles=100):
     return articles[:max_articles], links[:max_articles]  # **(更新：返回兩個列表且限制數量)**
 
 
-def scrape_keyword_trends(keyword):
+def scrape_keyword_trends(keyword, max_pages=10, timeout=10):
     """
     爬取 PTT 八卦板關鍵字的每日文章數據，用於趨勢分析。
 
     Args:
         keyword (str): 搜尋關鍵字
+        max_pages (int): 最大爬取頁數限制
+        timeout (int): 每個請求的超時時間（秒）
 
     Returns:
         pd.DataFrame: 包含日期和文章數的 DataFrame
@@ -95,12 +97,16 @@ def scrape_keyword_trends(keyword):
     url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
     cookies = {'over18': '1'}
     trends = {}
+    page_count = 0
 
-    while url:
+    while url and page_count < max_pages:
         try:
-            web = requests.get(url, cookies=cookies)
-            web.raise_for_status()
-            soup = BeautifulSoup(web.text, "html.parser")
+            # 增加超時設定和進度顯示
+            response = requests.get(url, cookies=cookies, timeout=timeout)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+            
+            # 抓取文章標題與日期
             titles = soup.find_all('div', class_='title')
             dates = soup.find_all('div', class_='date')
 
@@ -110,16 +116,15 @@ def scrape_keyword_trends(keyword):
                     try:
                         article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
                         date_str = article_date.strftime("%Y-%m-%d")
-                        if date_str in trends:
-                            trends[date_str] += 1
-                        else:
-                            trends[date_str] = 1
+                        trends[date_str] = trends.get(date_str, 0) + 1
                     except ValueError:
                         continue  # 日期解析錯誤，跳過該文章
 
+            # 進入下一頁
             next_page = soup.find('a', string="‹ 上頁")
             if next_page and 'href' in next_page.attrs:
                 url = base_url + next_page['href']
+                page_count += 1
             else:
                 break
 
@@ -135,5 +140,4 @@ def scrape_keyword_trends(keyword):
     trend_data["date"] = pd.to_datetime(trend_data["date"])
     trend_data.sort_values(by="date", inplace=True)
     return trend_data
-
 
