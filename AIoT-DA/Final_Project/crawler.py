@@ -15,13 +15,14 @@ def scrape_ptt(keyword, period, max_articles=100):
 
     Returns:
         List[str]: 清洗後的文章內容列表
+        List[str]: 對應的文章連結列表  **(新增描述)**
     """
     base_url = "https://www.ptt.cc"
     url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
     now_time = datetime.now() - relativedelta(months=period)
     cookies = {'over18': '1'}
     articles = []
-    links = []
+    links = []  # **(新增) 初始化連結列表**
     
     while url and len(articles) < max_articles:
         try:
@@ -37,7 +38,7 @@ def scrape_ptt(keyword, period, max_articles=100):
                     try:
                         article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
                         if article_date >= now_time:
-                            link = base_url + titles[i].find('a')['href']
+                            link = base_url + titles[i].find('a')['href']  # **(保持連結提取邏輯)**
                             # 抓取文章內容
                             article_response = requests.get(link, cookies=cookies)
                             article_response.raise_for_status()
@@ -56,10 +57,10 @@ def scrape_ptt(keyword, period, max_articles=100):
 
                                 # 只保留包含關鍵字的文章
                                 if keyword in content:
-                                    articles.append(content)
-                                    links.append(link)  # 保存連結
+                                    articles.append(content)  # **(保持原邏輯)**
+                                    links.append(link)  # **(新增：保存連結至列表)**
                         else:
-                            return articles, links
+                            return articles, links  # **(更新返回兩個列表)**
                     except ValueError:
                         continue  # 日期解析錯誤，跳過該文章
 
@@ -76,4 +77,4 @@ def scrape_ptt(keyword, period, max_articles=100):
             print(f"其他錯誤：{e}")
             break
 
-    return articles[:max_articles]  # 確保返回的文章數量不超過限制
+    return articles[:max_articles], links[:max_articles]  # **(更新：返回兩個列表且限制數量)**
