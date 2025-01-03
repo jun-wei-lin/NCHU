@@ -58,7 +58,7 @@ if option == "情感分析":
                     
                # 獲取 Streamlit 運行環境的工作目錄
                 current_dir = os.path.dirname(__file__)
-                font_path = os.path.join(current_dir, "assets", "fonts", "kaiu.ttf")  # 字體文件相對路徑
+                font_path = os.path.join(current_dir, "fonts", "kaiu.ttf")  # 字體文件相對路徑
                 
                 # 檢查字體文件是否存在
                 if not os.path.exists(font_path):
