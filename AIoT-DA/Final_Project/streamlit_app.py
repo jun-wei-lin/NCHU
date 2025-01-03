@@ -1,5 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import os
 
 # 定義主題與頁籤
 st.set_page_config(page_title="智慧社群洞察與熱門話題分析平台", layout="wide")
@@ -53,6 +55,18 @@ if option == "情感分析":
 
                 for label, count in label_counts.items():
                     st.write(f"{label}: {count} 篇")
+                    
+               # 獲取 Streamlit 運行環境的工作目錄
+                current_dir = os.path.dirname(__file__)
+                font_path = os.path.join(current_dir, "assets", "fonts", "kaiu.ttf")  # 字體文件相對路徑
+                
+                # 檢查字體文件是否存在
+                if not os.path.exists(font_path):
+                    raise FileNotFoundError(f"字體文件未找到，請確認路徑是否正確：{font_path}")
+                
+                # 加載字體
+                my_font = fm.FontProperties(fname=font_path)
+
                 # 繪製柱狀圖
                 import matplotlib.pyplot as plt
                 fig, ax = plt.subplots()
