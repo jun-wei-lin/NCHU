@@ -6,8 +6,11 @@ import os  # 確保匯入 os 模組
 
 def prepare_data(data):
     """清理並準備數據."""
-    data['date'] = pd.to_datetime(data['date'])
+    data['date'] = pd.to_datetime(data['date'], errors='coerce')  # 轉換日期，無效值轉為 NaT
+    data.dropna(subset=['date'], inplace=True)  # 移除無效日期
     data.set_index('date', inplace=True)
+    data['value'] = pd.to_numeric(data['value'], errors='coerce')  # 非數字轉為 NaN
+    data.dropna(subset=['value'], inplace=True)  # 移除無效數據
     return data
 
 def train_arima_model(data, order=(1, 1, 1)):
