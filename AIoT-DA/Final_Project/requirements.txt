@@ -11,5 +11,4 @@ numpy
 matplotlib
 scikit-learn
 statsmodels
-fbprophet  # Prophet 使用
-tensorflow  # LSTM 使用
+tensorflow
