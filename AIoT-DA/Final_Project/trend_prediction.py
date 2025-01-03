@@ -20,13 +20,13 @@ def predict_trends(fit, steps=30):
     return forecast
 
 def plot_trends(data, forecast):
-    """繪製趨勢圖."""
-    plt.figure(figsize=(10, 6))
-    plt.plot(data.index, data['value'], label="歷史數據")
+    """繪製趨勢圖並返回 figure 對象."""
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(data.index, data['value'], label="歷史數據")
     forecast_index = pd.date_range(data.index[-1], periods=len(forecast)+1, freq="D")[1:]
-    plt.plot(forecast_index, forecast, label="預測數據")
-    plt.legend()
-    plt.title("趨勢預測")
-    plt.xlabel("日期")
-    plt.ylabel("值")
-    plt.show()
+    ax.plot(forecast_index, forecast, label="預測數據")
+    ax.legend()
+    ax.set_title("趨勢預測")
+    ax.set_xlabel("日期")
+    ax.set_ylabel("值")
+    return fig
