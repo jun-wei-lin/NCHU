@@ -6,11 +6,12 @@ import re
 
 def scrape_ptt(keyword, period, max_articles=100):
     """
-    爬取 PTT 八卦板文章內容，並進行文本清洗。
+    爬取 PTT 八卦板文章內容，並進行文本清洗與限制文章數量。
 
     Args:
         keyword (str): 搜尋關鍵字
         period (int): 搜尋期間（單位：月）
+        max_articles (int): 最大文章數量限制
 
     Returns:
         List[str]: 清洗後的文章內容列表
@@ -21,7 +22,7 @@ def scrape_ptt(keyword, period, max_articles=100):
     cookies = {'over18': '1'}
     articles = []
 
-    while url:
+    while url and len(articles) < max_articles:
         try:
             web = requests.get(url, cookies=cookies)
             web.raise_for_status()
@@ -48,13 +49,14 @@ def scrape_ptt(keyword, period, max_articles=100):
                                 content = re.sub(r"\s+", " ", content)  # 合併多餘空格
                                 content = re.sub(r"(作者|看板|標題|時間).*?:", "", content)  # 移除無效元數據
                                 content = content.strip()  # 去掉首尾空格
+                                
                                 # 限制內容長度
-                                content = content[:1500]  # 限制為前 1500 字
-
+                                content = content[:1500]  # 限制為前 1500 字符
+                                
                                 # 只保留包含關鍵字的文章
                                 if keyword in content:
                                     articles.append(content)
-                                
+
                         else:
                             return articles
                     except ValueError:
@@ -73,4 +75,4 @@ def scrape_ptt(keyword, period, max_articles=100):
             print(f"其他錯誤：{e}")
             break
 
-    return articles
+    return articles[:max_articles]  # 確保返回的文章數量不超過限制
