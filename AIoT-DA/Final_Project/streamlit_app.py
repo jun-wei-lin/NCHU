@@ -15,7 +15,7 @@ option = st.sidebar.radio(
 if option == "首頁":
     st.title("智慧社群洞察與熱門話題分析平台")
     st.write("歡迎使用本平台！這裡提供基於 PTT 熱門話題的智能分析與趨勢預測工具。")
-# elif option == "情感分析":
+
 if option == "情感分析":
     st.title("情感分析模組")
     st.write("此模組將分析 PTT 文章的情感傾向（正面、中立、負面）。")
@@ -25,54 +25,37 @@ if option == "情感分析":
     period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)  # 限制最大值為 12 個月
     max_articles = 100  # 固定最大抓取文章數量為 100 篇
 
-    if st.button("開始分析"):
-        from modules.sentiment_analysis import analyze_sentiment
-        from crawler import scrape_ptt
+  if st.button("開始分析"):
+    from modules.sentiment_analysis import analyze_sentiment
+    from crawler import scrape_ptt
 
-        st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
-        articles = scrape_ptt(keyword, period, max_articles)
+    st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
+    articles = scrape_ptt(keyword, period, max_articles)
 
-        if not articles:
-            st.write("未找到相關文章")
-        else:
-            st.write(f"總共抓取到 {len(articles)} 篇文章")
-            try:
-                # 分析情感
-                st.write("正在分析情感...")
-                sentiment_results = analyze_sentiment(articles)
+    if not articles:
+        st.write("未找到相關文章")
+    else:
+        st.write(f"總共抓取到 {len(articles)} 篇文章")
 
-                # 統計情感分佈
-                st.write("情感分佈統計：")
-                labels = [result["label"] for result in sentiment_results]
-                label_counts = {label: labels.count(label) for label in set(labels)}
+        # 檢查文章的 Token 長度
+        st.write("檢查文章長度（前 5 篇）：")
+        for i, article in enumerate(articles[:5]):
+            encoded_input = tokenizer(article, truncation=True, max_length=512, return_tensors="pt")
+            st.write(f"文章 {i+1} 原始字符數：{len(article)}，截斷後 Token 數：{len(encoded_input['input_ids'][0])}")
 
-                for label, count in label_counts.items():
-                    st.write(f"{label}: {count} 篇")
+        try:
+            # 分析情感
+            st.write("正在分析情感...")
+            sentiment_results = analyze_sentiment(articles)
 
-                # 繪製柱狀圖
-                import matplotlib.pyplot as plt
-                fig, ax = plt.subplots()
-                ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red', 'blue'])
-                ax.set_title("情感分佈")
-                ax.set_xlabel("情感類別")
-                ax.set_ylabel("文章數量")
-                st.pyplot(fig)
+            # 顯示分析結果
+            st.write("分析結果：")
+            for article, sentiment in zip(articles, sentiment_results):
+                st.write(f"文章內容：{article[:100]}...")  # 顯示前 100 字
+                st.json(sentiment)
 
-                # 展示每種情感標籤的文章三篇
-                st.write("展示各情感類別的文章：")
-                for label in label_counts.keys():
-                    st.write(f"**{label} 類文章**（展示三篇）:")
-                    displayed_articles = [articles[i][:100] for i, result in enumerate(sentiment_results) if result["label"] == label][:3]
-                    if not displayed_articles:
-                        st.write("無符合條件的文章")
-                    else:
-                        for i, article in enumerate(displayed_articles):
-                            st.write(f"文章 {i+1}: {article}...")
-                            st.json(sentiment_results[articles.index(article)])
-
-            except ValueError as e:
-                st.error(f"錯誤：{e}")
-
+        except ValueError as e:
+            st.error(f"錯誤：{e}")
 
 
 elif option == "趨勢預測":
