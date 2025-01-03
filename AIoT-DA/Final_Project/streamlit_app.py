@@ -41,22 +41,39 @@ if option == "情感分析":
             # 初始化 tokenizer
             tokenizer = AutoTokenizer.from_pretrained("uer/roberta-base-finetuned-jd-binary-chinese")
 
-            # 檢查文章的 Token 長度
-            st.write("檢查文章長度（前 5 篇）：")
-            for i, article in enumerate(articles[:5]):
-                encoded_input = tokenizer(article, truncation=True, max_length=512, return_tensors="pt")
-                st.write(f"文章 {i+1} 原始字符數：{len(article)}，截斷後 Token 數：{len(encoded_input['input_ids'][0])}")
-
             try:
                 # 分析情感
                 st.write("正在分析情感...")
                 sentiment_results = analyze_sentiment(articles)
 
-                # 顯示分析結果
-                st.write("分析結果：")
-                for article, sentiment in zip(articles, sentiment_results):
-                    st.write(f"文章內容：{article[:100]}...")  # 顯示前 100 字
-                    st.json(sentiment)
+                # 統計情感分佈
+                st.write("情感分佈統計：")
+                labels = [result["label"] for result in sentiment_results]
+                label_counts = {label: labels.count(label) for label in set(labels)}
+
+                for label, count in label_counts.items():
+                    st.write(f"{label}: {count} 篇")
+                # 繪製柱狀圖
+                import matplotlib.pyplot as plt
+                fig, ax = plt.subplots()
+                ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red', 'blue'])
+                ax.set_title("情感分佈")
+                ax.set_xlabel("情感類別")
+                ax.set_ylabel("文章數量")
+                st.pyplot(fig)
+
+                # 展示各種情感標籤的文章三篇
+                st.write("展示各情感類別的文章：")
+                for label in label_counts.keys():
+                    st.write(f"**{label} 類文章**（展示三篇）：")
+                    count = 0
+                    for i, result in enumerate(sentiment_results):
+                        if result["label"] == label and count < 3:
+                            st.write(f"文章 {count+1}：{articles[i][:100]}...")  # 顯示前 100 字
+                            st.json(result)  # 顯示情感分析結果
+                            count += 1
+                    if count == 0:
+                        st.write("無符合條件的文章")
 
             except ValueError as e:
                 st.error(f"錯誤：{e}")
