@@ -3,7 +3,6 @@ ckiptagger
 wordcloud
 requests
 beautifulsoup4
-tensorflow
 python-dateutil
 transformers
 torch
