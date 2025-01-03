@@ -33,8 +33,7 @@ if option == "情感分析":
         from transformers import AutoTokenizer  # 新增 tokenizer
 
         st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
-        articles = scrape_ptt(keyword, period, max_articles)
-
+        articles, links = scrape_ptt(keyword, period, max_articles)  # 確保返回連結
         if not articles:
             st.write("未找到相關文章")
         else:
@@ -84,7 +83,7 @@ if option == "情感分析":
                         if result["label"] == label and count < 3:
                             st.write(f"文章 {count+1}：{articles[i][:100]}...")  # 顯示前 100 字
                             st.json(result)  # 顯示情感分析結果
-                            st.markdown(f"[查看原文]({links[i]})")  # 提供原文連結
+                            st.markdown(f"<span style='color:blue; font-weight:bold;'>[查看原文]({links[i]})</span>", unsafe_allow_html=True)  # 提供原文連結，使用樣式
                             count += 1
                     if count == 0:
                         st.write("無符合條件的文章")
