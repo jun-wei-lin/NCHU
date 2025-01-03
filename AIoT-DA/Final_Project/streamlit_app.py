@@ -118,8 +118,9 @@ elif option == "趨勢預測":
                 # 顯示結果
                 st.write("未來 30 天的趨勢預測：")
                 st.line_chart(forecast)
-                st.pyplot(plot_trends(prepared_data, forecast))
-
+                fig = plot_trends(prepared_data, forecast)
+                st.pyplot(fig)
+                
             except Exception as e:
                 st.error(f"趨勢預測過程中出現錯誤：{e}")
 
