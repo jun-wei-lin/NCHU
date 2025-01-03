@@ -1,4 +1,5 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 
 # 定義主題與頁籤
 st.set_page_config(page_title="智慧社群洞察與熱門話題分析平台", layout="wide")
@@ -41,6 +42,23 @@ if st.button("開始分析"):
                 st.json(sentiment)
         except ValueError as e:
             st.error(f"錯誤：{e}")
+
+# 分析結果
+if sentiment_results:
+    st.write("分析結果：")
+    
+    # 統計情感分佈
+    labels = [result["label"] for result in sentiment_results]
+    label_counts = {label: labels.count(label) for label in set(labels)}
+    
+    # 繪製柱狀圖
+    fig, ax = plt.subplots()
+    ax.bar(label_counts.keys(), label_counts.values(), color=['green', 'red'])
+    ax.set_title("情感分佈")
+    ax.set_xlabel("情感類別")
+    ax.set_ylabel("文章數量")
+    st.pyplot(fig)
+
 
 elif option == "趨勢預測":
     st.title("趨勢預測模組")
