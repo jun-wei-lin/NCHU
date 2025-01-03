@@ -12,7 +12,7 @@ def prepare_data(data):
 
 def train_arima_model(data, order=(1, 1, 1)):
     """訓練 ARIMA 模型."""
-    model = ARIMA(data['value'], order=order)
+    model = ARIMA(data['value'], order=(2, 1, 2))  # 更高階的模型
     fit = model.fit()
     return fit
 
@@ -24,19 +24,19 @@ def predict_trends(fit, steps=30):
 def plot_trends(data, forecast, font_path):
     """繪製趨勢圖並支持中文標籤."""
     # 加載字體
-    if not font_path or not os.path.exists(font_path):
-        raise FileNotFoundError(f"字體文件未找到：{font_path}")
     my_font = fm.FontProperties(fname=font_path)
 
     # 繪圖
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(data.index, data['value'], label="歷史數據", linestyle='-', marker='o')
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(data.index, data['value'], label="歷史數據", linestyle='-', marker='o', color='blue')
     forecast_index = pd.date_range(data.index[-1], periods=len(forecast)+1, freq="D")[1:]
-    ax.plot(forecast_index, forecast, label="預測數據", linestyle='--', marker='x')
-    
+    ax.plot(forecast_index, forecast, label="預測數據", linestyle='--', marker='x', color='orange')
+
     # 中文標籤
-    ax.legend(prop=my_font)
-    ax.set_title("趨勢預測", fontproperties=my_font)
-    ax.set_xlabel("日期", fontproperties=my_font)
-    ax.set_ylabel("值", fontproperties=my_font)
+    ax.legend(prop=my_font, loc="upper left")
+    ax.set_title("趨勢預測", fontproperties=my_font, fontsize=16)
+    ax.set_xlabel("日期", fontproperties=my_font, fontsize=12)
+    ax.set_ylabel("文章數量", fontproperties=my_font, fontsize=12)
+    ax.grid(True, linestyle='--', alpha=0.7)
+
     return fig
