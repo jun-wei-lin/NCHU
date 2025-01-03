@@ -1,4 +1,4 @@
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer
 
 def analyze_sentiment(articles):
     """
@@ -12,11 +12,17 @@ def analyze_sentiment(articles):
     """
     # 初始化情感分析管道，啟用自動截斷
     sentiment_pipeline = pipeline("sentiment-analysis", model="uer/roberta-base-finetuned-jd-binary-chinese", framework="pt", truncation=True)
+     tokenizer = AutoTokenizer.from_pretrained("uer/roberta-base-finetuned-jd-binary-chinese")
 
-    # 確保輸入是字符串列表
-    if not isinstance(articles, list) or not all(isinstance(article, str) for article in articles):
-        raise ValueError("輸入應為包含字符串的列表 (List[str])")
+    results = []
+    for article in articles:
+        # 使用分詞器進行截斷
+        encoded_input = tokenizer(article, truncation=True, max_length=512, return_tensors="pt")
+        truncated_text = tokenizer.decode(encoded_input["input_ids"][0])
+        
 
     # 分析情感
-    results = sentiment_pipeline(articles)
+    sentiment = sentiment_pipeline(truncated_text)[0]
+    results.append(sentiment)
+  
     return results
