@@ -81,7 +81,7 @@ def scrape_ptt(keyword, period, max_articles=100):
     return articles[:max_articles], links[:max_articles]  # **(更新：返回兩個列表且限制數量)**
 
 
-def scrape_keyword_trends(keyword, max_pages=10, timeout=10):
+def scrape_keyword_trends(keyword, max_pages=20, timeout=10):
     """
     爬取 PTT 八卦板關鍵字的每日文章數據，用於趨勢分析。
 
