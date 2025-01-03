@@ -1,7 +1,7 @@
 
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime,date
 from dateutil.relativedelta import relativedelta
 import csv
 
@@ -59,7 +59,13 @@ while url:  # 當還有下一頁時繼續爬取
             article_time=article_time.split('/')
             if len(article_time)==2:
                 current_year=datetime.now().year
-                article_time=datetime(current_year,int(article_time[0]),int(article_time[1]))
+                today=date.today()
+                input_date=datetime.strptime(f"{current_year}/{article_time[0]+'/'+article_time[1]}", "%Y/%m/%d").date()
+                if input_date >today:
+                    article_time=datetime(2024,int(article_time[0]),int(article_time[1]))
+                else:
+                    article_time=datetime(2025,int(article_time[0]),int(article_time[1]))
+                #article_time=datetime(current_year,int(article_time[0]),int(article_time[1]))
             else:
                 article_time=datetime(int(article_time[0]),int(article_time[1]),int(article_time[2]))
 
@@ -77,7 +83,7 @@ while url:  # 當還有下一頁時繼續爬取
         break
     # 嘗試找到「上頁」按鈕
     btn_previous = soup.find('a', string="‹ 上頁")  # 查找文字為「‹ 上頁」的連結
-    if btn_previous:
+    if btn_previous and 'disabled' not in btn_previous.get('class', []) and btn_previous.has_attr('href'):
         url = base_url + btn_previous['href']  # 更新 URL 指向上頁
     else:
         break  # 如果沒有「上頁」按鈕，結束爬蟲
@@ -109,7 +115,7 @@ with open(path,'w',encoding='utf-8',newline='') as f:
   for i in range(len(articles)):
     writer.writerow([articles[i]])
 
-
+"""
 #---------------------------------------------------------------------------
 #字詞分析
 
@@ -187,5 +193,5 @@ plt.axis('off')  # 隱藏座標軸
 plt.title(f'Top 50 Word Cloud:{keyword}', fontsize=16)
 
 plt.show()
-
+"""
 input('案enter結束程式')
