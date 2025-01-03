@@ -58,11 +58,11 @@ def plot_trends(data, forecast, font_path):
     interval = max(len(data) // 10, 1)  # 每 10 個點顯示一個標籤
     for i, value in enumerate(data['value']):
         if i % interval == 0:
-            ax.text(data.index[i], value, f"{value}", fontsize=10, color="blue", ha="right", fontproperties=my_font)
+            ax.text(data.index[i], float(value), f"{float(value):.1f}", fontsize=10, color="blue", ha="right", fontproperties=my_font)
 
     for i, value in enumerate(forecast):
         if i % interval == 0:
-            ax.text(forecast_index[i], value, f"{value:.1f}", fontsize=10, color="orange", ha="left", fontproperties=my_font)
+            ax.text(forecast_index[i], float(value), f"{float(value):.1f}", fontsize=10, color="orange", ha="left", fontproperties=my_font)
 
     ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter("%Y-%m-%d"))
     fig.autofmt_xdate()
