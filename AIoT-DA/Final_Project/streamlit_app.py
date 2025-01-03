@@ -25,37 +25,41 @@ if option == "情感分析":
     period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)  # 限制最大值為 12 個月
     max_articles = 100  # 固定最大抓取文章數量為 100 篇
 
-if st.button("開始分析"):
-    from modules.sentiment_analysis import analyze_sentiment
-    from crawler import scrape_ptt
+    if st.button("開始分析"):
+        from modules.sentiment_analysis import analyze_sentiment
+        from crawler import scrape_ptt
+        from transformers import AutoTokenizer  # 新增 tokenizer
 
-    st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
-    articles = scrape_ptt(keyword, period, max_articles)
+        st.write("正在抓取文章內容...（最多抓取 100 篇文章）")
+        articles = scrape_ptt(keyword, period, max_articles)
 
-    if not articles:
-        st.write("未找到相關文章")
-    else:
-        st.write(f"總共抓取到 {len(articles)} 篇文章")
+        if not articles:
+            st.write("未找到相關文章")
+        else:
+            st.write(f"總共抓取到 {len(articles)} 篇文章")
 
-        # 檢查文章的 Token 長度
-        st.write("檢查文章長度（前 5 篇）：")
-        for i, article in enumerate(articles[:5]):
-            encoded_input = tokenizer(article, truncation=True, max_length=512, return_tensors="pt")
-            st.write(f"文章 {i+1} 原始字符數：{len(article)}，截斷後 Token 數：{len(encoded_input['input_ids'][0])}")
+            # 初始化 tokenizer
+            tokenizer = AutoTokenizer.from_pretrained("uer/roberta-base-finetuned-jd-binary-chinese")
 
-        try:
-            # 分析情感
-            st.write("正在分析情感...")
-            sentiment_results = analyze_sentiment(articles)
+            # 檢查文章的 Token 長度
+            st.write("檢查文章長度（前 5 篇）：")
+            for i, article in enumerate(articles[:5]):
+                encoded_input = tokenizer(article, truncation=True, max_length=512, return_tensors="pt")
+                st.write(f"文章 {i+1} 原始字符數：{len(article)}，截斷後 Token 數：{len(encoded_input['input_ids'][0])}")
 
-            # 顯示分析結果
-            st.write("分析結果：")
-            for article, sentiment in zip(articles, sentiment_results):
-                st.write(f"文章內容：{article[:100]}...")  # 顯示前 100 字
-                st.json(sentiment)
+            try:
+                # 分析情感
+                st.write("正在分析情感...")
+                sentiment_results = analyze_sentiment(articles)
 
-        except ValueError as e:
-            st.error(f"錯誤：{e}")
+                # 顯示分析結果
+                st.write("分析結果：")
+                for article, sentiment in zip(articles, sentiment_results):
+                    st.write(f"文章內容：{article[:100]}...")  # 顯示前 100 字
+                    st.json(sentiment)
+
+            except ValueError as e:
+                st.error(f"錯誤：{e}")
 
 
 elif option == "趨勢預測":
