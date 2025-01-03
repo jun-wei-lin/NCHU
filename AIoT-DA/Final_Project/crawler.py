@@ -8,13 +8,14 @@ def scrape_ptt(keyword, period, max_articles=100):
     """
     爬取 PTT 八卦板文章內容，並進行文本清洗與限制文章數量。
 
+    
     Args:
         keyword (str): 搜尋關鍵字
         period (int): 搜尋期間（單位：月）
         max_articles (int): 最大文章數量限制
 
     Returns:
-        List[str]: 清洗後的文章內容列表
+       List[Tuple[str, str]]: 清洗後的文章內容列表、每篇文章的內容和原文連結
     """
     base_url = "https://www.ptt.cc"
     url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
@@ -52,13 +53,15 @@ def scrape_ptt(keyword, period, max_articles=100):
                                 
                                 # 限制內容長度
                                 content = content[:1500]  # 限制文章字符長度，避免超長文本
-
+                           
                                 # 只保留包含關鍵字的文章
                                 if keyword in content:
                                     articles.append(content)
-
+                                    
+                                articles_with_links.append((content, link))
+                                
                         else:
-                            return articles
+                            return articles_with_links
                     except ValueError:
                         continue  # 日期解析錯誤，跳過該文章
 
