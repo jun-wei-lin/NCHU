@@ -17,7 +17,27 @@ if option == "首頁":
 elif option == "情感分析":
     st.title("情感分析模組")
     st.write("此模組將分析 PTT 文章的情感傾向（正面、中立、負面）。")
-    # 暫時占位，未整合功能
+     # 使用者輸入
+    keyword = st.text_input("請輸入關鍵字：")
+    period = st.number_input("搜尋期間（月）", min_value=1, value=3)
+    
+    if st.button("開始分析"):
+        from modules.sentiment_analysis import analyze_sentiment
+        from crawler import scrape_ptt
+
+        # 爬取文章
+        st.write("正在抓取文章內容...")
+        links = scrape_ptt(keyword, period)
+        articles = [link["content"] for link in links]  # 假設抓取內容
+
+        # 分析情感
+        st.write("正在分析情感...")
+        sentiment_results = analyze_sentiment(articles)
+
+        # 展示結果
+        st.write("分析結果：")
+        for result in sentiment_results:
+            st.json(result)
 elif option == "趨勢預測":
     st.title("趨勢預測模組")
     st.write("此模組將分析熱門關鍵字的趨勢並進行未來預測。")
@@ -33,4 +53,7 @@ elif option == "個性化推薦":
 elif option == "文本摘要":
     st.title("文本摘要模組")
     st.write("此模組將為每篇文章生成簡短摘要，幫助快速掌握重點。")
+
+
+
     # 暫時占位，未整合功能
