@@ -124,10 +124,10 @@ elif option == "趨勢預測":
             try:
                 prepared_data = prepare_data(trend_data)
                 model = train_arima_model(prepared_data, order=(1, 1, 1))
-                forecast = predict_trends(model, steps=30)
+                forecast = predict_trends(model, steps=6)  # 預測未來 6 個月
 
                 # 顯示結果
-                st.write("未來 30 天的趨勢預測：")
+                st.write("未來 6 個月的趨勢預測：")
                 st.line_chart(forecast)
                 
                 current_dir = os.path.dirname(__file__)
