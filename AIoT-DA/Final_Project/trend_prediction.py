@@ -28,37 +28,42 @@ def predict_trends(fit, steps=30):
 
 
 
-def plot_trends(data, forecast, font_path):
-    """繪製趨勢圖並支持中文標籤."""
+def plot_trends(data, forecast, font_path, history_months=3):
+    """
+    繪製趨勢圖，限制歷史數據範圍，並支持中文標籤。
+
+    Args:
+        data (pd.DataFrame): 包含日期和數值的歷史數據。
+        forecast (pd.Series): 預測數據。
+        font_path (str): 字體文件路徑。
+        history_months (int): 要顯示的歷史數據月份數。
+
+    Returns:
+        fig: Matplotlib 圖像對象。
+    """
     # 加載字體
     my_font = fm.FontProperties(fname=font_path)
 
-    # 確保歷史數據的日期範圍有效
-    data = data[data.index <= pd.Timestamp.now()]  # 過濾超過當前日期的數據
+    # 限制歷史數據範圍（過去指定月數）
+    now = pd.Timestamp.now()
+    start_date = now - pd.DateOffset(months=history_months)
+    limited_data = data[data.index >= start_date]  # 過濾數據
+
+    # 生成預測日期範圍
+    forecast_index = pd.date_range(start=limited_data.index[-1], periods=len(forecast) + 1, freq="D")[1:]
 
     # 繪圖
     fig, ax = plt.subplots(figsize=(12, 6))
-    ax.plot(data.index, data['value'], label="歷史數據", linestyle='-', marker='o', color='blue')
-    forecast_index = pd.date_range(data.index[-1], periods=len(forecast)+1, freq="D")[1:]
+    ax.plot(limited_data.index, limited_data['value'], label="歷史數據", linestyle='-', marker='o', color='blue')
     ax.plot(forecast_index, forecast, label="預測數據", linestyle='--', marker='x', color='orange')
 
     # 格式化 X 軸日期
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
     fig.autofmt_xdate()  # 自動旋轉日期標籤
 
-    # 限制 X 軸日期範圍（例如最近一年的數據）
-    ax.set_xlim([pd.Timestamp("2025-01-01"), pd.Timestamp("2025-02-01")])  # 可根據需求調整
+    # 自動設置 X 軸範圍，從過去指定月份到預測結束日期
+    ax.set_xlim([limited_data.index.min(), forecast_index[-1]])
 
-    
-    # 添加標籤間隔
-    interval = max(1, len(data) // 10)  # 每 10 個數據點顯示一個標籤
-    for i, value in enumerate(data['value']):
-        if i % interval == 0:
-            ax.text(data.index[i], value, f"{value}", fontsize=10, color="blue", ha="right", fontproperties=my_font)
-    for i, value in enumerate(forecast):
-        if i % interval == 0:
-            ax.text(forecast_index[i], value, f"{value}", fontsize=10, color="orange", ha="left", fontproperties=my_font)
-    
     # 中文標籤
     ax.legend(prop=my_font, loc="upper left")
     ax.set_title("趨勢預測", fontproperties=my_font, fontsize=16)
@@ -67,3 +72,4 @@ def plot_trends(data, forecast, font_path):
     ax.grid(True, linestyle='--', alpha=0.7)
 
     return fig
+
