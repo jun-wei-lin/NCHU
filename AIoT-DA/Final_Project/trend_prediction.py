@@ -1,6 +1,7 @@
 from statsmodels.tsa.arima.model import ARIMA
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import matplotlib.font_manager as fm  # 匯入字體管理
 import os  # 確保匯入 os 模組
 
@@ -17,9 +18,11 @@ def train_arima_model(data, order=(1, 1, 1)):
     return fit
 
 def predict_trends(fit, steps=30):
-    """預測未來趨勢."""
+    """預測未來趨勢並返回整數結果."""
     forecast = fit.forecast(steps=steps)
+    forecast = forecast.round().astype(int)  # 將預測結果轉換為整數
     return forecast
+
 
 def plot_trends(data, forecast, font_path):
     """繪製趨勢圖並支持中文標籤."""
