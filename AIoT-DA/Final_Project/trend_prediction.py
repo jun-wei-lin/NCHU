@@ -35,6 +35,10 @@ def plot_trends(data, forecast, font_path):
     forecast_index = pd.date_range(data.index[-1], periods=len(forecast)+1, freq="D")[1:]
     ax.plot(forecast_index, forecast, label="預測數據", linestyle='--', marker='x', color='orange')
 
+    # 格式化 X 軸日期
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+    fig.autofmt_xdate()  # 自動旋轉日期標籤
+
     # 中文標籤
     ax.legend(prop=my_font, loc="upper left")
     ax.set_title("趨勢預測", fontproperties=my_font, fontsize=16)
