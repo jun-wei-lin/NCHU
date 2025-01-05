@@ -103,8 +103,7 @@ elif option == "趨勢預測":
         st.write("正在爬取數據...")
         
         trend_data = scrape_keyword_trends(keyword)
-        date001 = scrape_keyword_trends(dates)
-        print(date001[0],date001[1],date001[2])
+        print(trend_data)
         if trend_data.empty:
             st.write("未找到相關數據，請嘗試其他關鍵字。")
         else:
