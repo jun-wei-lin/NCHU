@@ -140,5 +140,5 @@ def scrape_keyword_trends(keyword, max_pages=100, timeout=10):
     trend_data = pd.DataFrame(list(trends.items()), columns=["date", "value"])
     trend_data["date"] = pd.to_datetime(trend_data["date"])
     trend_data.sort_values(by="date", inplace=True)
-    return trend_data
+    return trend_data , dates
 
