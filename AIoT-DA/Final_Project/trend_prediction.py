@@ -10,20 +10,28 @@ def prepare_data(data):
     data['date'] = pd.to_datetime(data['date'])
     data.set_index('date', inplace=True)
 
-
+    # 處理缺失值
+    data['value'] = data['value'].fillna(0)  # 將缺失值填充為 0
     return data
 
 def train_arima_model(data, order=(1, 1, 1)):
     """訓練 ARIMA 模型."""
-    model = ARIMA(data['value'], order=(1, 1, 1))  # 更高階的模型
-    fit = model.fit()
-    return fit
+    try:
+        model = ARIMA(data['value'], order=order)
+        fit = model.fit()
+        return fit
+    except Exception as e:
+        raise ValueError(f"ARIMA 模型訓練失敗：{e}")
 
 def predict_trends(fit, steps=30):
     """預測未來趨勢並返回整數結果."""
-    forecast = fit.forecast(steps=steps)
-    forecast = forecast.clip(lower=0).round().astype(int)  # 限制最小值為 0 並轉為整數
-    return forecast
+    try:
+        forecast = fit.forecast(steps=steps)
+        forecast = forecast.clip(lower=0).round().astype(int)  # 限制最小值為 0 並轉為整數
+        return forecast
+    except Exception as e:
+        raise ValueError(f"預測過程中出現錯誤：{e}")
+
 
 
 def plot_trends(data, forecast, font_path, history_months=3):
