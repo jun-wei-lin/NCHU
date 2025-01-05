@@ -114,11 +114,6 @@ def scrape_keyword_trends(keyword, max_pages=100, timeout=10):
                 if titles[i].find('a'):  # 確保有連結
                     date_text = dates[i].get_text().strip()
 
-                    # 檢查日期格式
-                    if not re.match(r"^\d{1,2}/\d{1,2}$", date_text):
-                        print(f"日期格式錯誤：{date_text}")
-                        continue
-                    
                     try:
                         article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
                         date_str = article_date.strftime("%Y-%m-%d")
@@ -144,7 +139,6 @@ def scrape_keyword_trends(keyword, max_pages=100, timeout=10):
     # 將結果轉換為 DataFrame
     trend_data = pd.DataFrame(list(trends.items()), columns=["date", "value"])
     trend_data["date"] = pd.to_datetime(trend_data["date"])
-    trend_data = trend_data[trend_data["date"] <= pd.Timestamp.now()]  # 過濾未來日期
     trend_data.sort_values(by="date", inplace=True)
     return trend_data
 
