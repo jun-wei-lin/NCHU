@@ -9,8 +9,7 @@ def prepare_data(data):
     """清理並準備數據."""
     data['date'] = pd.to_datetime(data['date'])
     data.set_index('date', inplace=True)
-    data['value'] = pd.to_numeric(data['value'], errors='coerce')  # 非數字轉為 NaN
-    data.dropna(subset=['value'], inplace=True)  # 移除 NaN
+
 
     return data
 
