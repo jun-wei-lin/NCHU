@@ -101,13 +101,24 @@ elif option == "趨勢預測":
     keyword = st.text_input("請輸入關鍵字進行趨勢分析：")
     if st.button("開始趨勢預測"):
         st.write("正在爬取數據...")
+
+        # 初始化進度條和動態文本
+        progress_bar = st.progress(0)
+        progress_text = st.empty()
+
+        # 回調函數，用於更新進度
+        def update_progress(message):
+            progress_text.write(message)
         
-        trend_data = scrape_keyword_trends(keyword)
+        # 爬取數據
+        trend_data = scrape_keyword_trends(keyword, on_progress=update_progress)
+        progress_bar.empty()
+
         if trend_data.empty:
             st.write("未找到相關數據，請嘗試其他關鍵字。")
         else:
             st.write("數據抓取成功！")
-            st.write(trend_data.head())
+            st.dataframe(trend_data)
 
             # 預測趨勢
             try:
@@ -124,9 +135,10 @@ elif option == "趨勢預測":
                 
                 fig = plot_trends(prepared_data, forecast, font_path=font_path)
                 st.pyplot(fig)
-                
+
             except Exception as e:
                 st.error(f"趨勢預測過程中出現錯誤：{e}")
+
 
 
 elif option == "用戶行為分析":
