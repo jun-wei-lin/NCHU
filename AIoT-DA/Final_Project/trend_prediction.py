@@ -26,7 +26,6 @@ def predict_trends(fit, steps=30):
     return forecast
 
 
-
 def plot_trends(data, forecast, font_path, history_months=3):
     """
     繪製趨勢圖，限制歷史數據範圍，並支持中文標籤。
@@ -40,13 +39,19 @@ def plot_trends(data, forecast, font_path, history_months=3):
     Returns:
         fig: Matplotlib 圖像對象。
     """
+    if data.empty or forecast.empty:
+        raise ValueError("無有效數據進行繪圖。")
+
     # 加載字體
     my_font = fm.FontProperties(fname=font_path)
 
     # 限制歷史數據範圍（過去指定月數）
     now = pd.Timestamp.now()
     start_date = now - pd.DateOffset(months=history_months)
-    limited_data = data[data.index >= start_date]  # 過濾數據
+    limited_data = data[data.index >= start_date]
+
+    if limited_data.empty:
+        raise ValueError("過濾後的歷史數據為空，請檢查數據範圍。")
 
     # 生成預測日期範圍
     forecast_index = pd.date_range(start=limited_data.index[-1], periods=len(forecast) + 1, freq="D")[1:]
@@ -71,4 +76,5 @@ def plot_trends(data, forecast, font_path, history_months=3):
     ax.grid(True, linestyle='--', alpha=0.7)
 
     return fig
+
 
