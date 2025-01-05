@@ -33,6 +33,9 @@ def plot_trends(data, forecast, font_path):
     # 加載字體
     my_font = fm.FontProperties(fname=font_path)
 
+    # 確保歷史數據的日期範圍有效
+    data = data[data.index <= pd.Timestamp.now()]  # 過濾超過當前日期的數據
+
     # 繪圖
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(data.index, data['value'], label="歷史數據", linestyle='-', marker='o', color='blue')
@@ -43,7 +46,10 @@ def plot_trends(data, forecast, font_path):
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
     fig.autofmt_xdate()  # 自動旋轉日期標籤
 
+    # 限制 X 軸日期範圍（例如最近一年的數據）
+    ax.set_xlim([pd.Timestamp("2025-01-01"), pd.Timestamp("2025-02-01")])  # 可根據需求調整
 
+    
     # 添加標籤間隔
     interval = max(1, len(data) // 10)  # 每 10 個數據點顯示一個標籤
     for i, value in enumerate(data['value']):
