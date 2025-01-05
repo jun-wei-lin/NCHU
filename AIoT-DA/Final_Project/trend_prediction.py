@@ -23,8 +23,9 @@ def train_arima_model(data, order=(1, 1, 1)):
 def predict_trends(fit, steps=30):
     """預測未來趨勢並返回整數結果."""
     forecast = fit.forecast(steps=steps)
-    forecast = forecast.round().astype(int)  # 將預測結果轉換為整數
+    forecast = forecast.clip(lower=0).round().astype(int)  # 限制最小值為 0 並轉為整數
     return forecast
+
 
 
 def plot_trends(data, forecast, font_path):
