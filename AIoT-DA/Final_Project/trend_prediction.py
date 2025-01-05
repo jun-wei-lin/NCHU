@@ -7,6 +7,13 @@ import os  # 確保匯入 os 模組
 
 def prepare_data(data):
     """清理並準備數據."""
+    # 確保列名正確
+    if 'date' not in data.columns and 'month' in data.columns:
+        data = data.rename(columns={'month': 'date'})
+
+    if 'date' not in data.columns:
+        raise ValueError("數據中缺少 'date' 列，無法進行處理。")
+
     data['date'] = pd.to_datetime(data['date'])
     data.set_index('date', inplace=True)
 
