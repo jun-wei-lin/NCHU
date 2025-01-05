@@ -11,7 +11,7 @@ def prepare_data(data):
     data.set_index('date', inplace=True)
     data['value'] = pd.to_numeric(data['value'], errors='coerce')  # 非數字轉為 NaN
     data.dropna(subset=['value'], inplace=True)  # 移除 NaN
-    data['value'] = data['value'].clip(lower=0, upper=data['value'].quantile(0.95))  # 限制最大值在95分位
+
     return data
 
 def train_arima_model(data, order=(1, 1, 1)):
