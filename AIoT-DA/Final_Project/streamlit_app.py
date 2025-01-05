@@ -132,7 +132,13 @@ elif option == "趨勢預測":
 elif option == "用戶行為分析":
     st.title("用戶行為分析模組")
     st.write("此模組將分析 PTT 用戶發文行為模式與特性。")
-    # 暫時占位，未整合功能
+    
+    from user_behavior_analysis import main as behavior_analysis_main
+    
+    # 其他 Streamlit 頁面代碼
+    if menu_option == "User Behavior Analysis":
+        behavior_analysis_main()
+
 elif option == "個性化推薦":
     st.title("個性化推薦模組")
     st.write("此模組將根據您的興趣推薦相關文章或話題。")
