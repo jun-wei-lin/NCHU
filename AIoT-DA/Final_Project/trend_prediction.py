@@ -43,6 +43,16 @@ def plot_trends(data, forecast, font_path):
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
     fig.autofmt_xdate()  # 自動旋轉日期標籤
 
+
+    # 添加標籤間隔
+    interval = max(1, len(data) // 10)  # 每 10 個數據點顯示一個標籤
+    for i, value in enumerate(data['value']):
+        if i % interval == 0:
+            ax.text(data.index[i], value, f"{value}", fontsize=10, color="blue", ha="right", fontproperties=my_font)
+    for i, value in enumerate(forecast):
+        if i % interval == 0:
+            ax.text(forecast_index[i], value, f"{value}", fontsize=10, color="orange", ha="left", fontproperties=my_font)
+    
     # 中文標籤
     ax.legend(prop=my_font, loc="upper left")
     ax.set_title("趨勢預測", fontproperties=my_font, fontsize=16)
