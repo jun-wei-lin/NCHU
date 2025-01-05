@@ -13,7 +13,7 @@ def prepare_data(data):
 
 def train_arima_model(data, order=(1, 1, 1)):
     """訓練 ARIMA 模型."""
-    model = ARIMA(data['value'], order=(2, 1, 2))  # 更高階的模型
+    model = ARIMA(data['value'], order=(1, 1, 1))  # 更高階的模型
     fit = model.fit()
     return fit
 
