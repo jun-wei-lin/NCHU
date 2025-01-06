@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
 import streamlit as st
-from crawler import scrape_user_behavior  # 調用新增的爬蟲函數
+from crawler import scrape_user_behavior
 from sklearn.preprocessing import StandardScaler
 
 # 設定中文字體
@@ -16,7 +16,6 @@ def set_chinese_font():
     if not os.path.exists(font_path):
         raise FileNotFoundError(f"字體文件未找到，請確認路徑是否正確：{font_path}")
     return fm.FontProperties(fname=font_path)
-
 
 def perform_clustering(data, max_clusters=5):
     """
@@ -53,9 +52,10 @@ def perform_clustering(data, max_clusters=5):
     # 可視化肘部法則
     plt.figure(figsize=(6, 4))
     plt.plot(range(1, max_clusters + 1), inertia, marker='o')
-    plt.title("肘部法則：分群數 vs. 惰性")
-    plt.xlabel("分群數 (k)")
-    plt.ylabel("惰性 (Inertia)")
+    plt.title("肘部法則：分群數 vs. 惰性", fontproperties=set_chinese_font())
+    plt.xlabel("分群數 (k)", fontproperties=set_chinese_font())
+    plt.ylabel("惰性 (Inertia)", fontproperties=set_chinese_font())
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
 
     # Step 4: K-means 分群
@@ -71,7 +71,6 @@ def perform_clustering(data, max_clusters=5):
 
     return user_stats, kmeans, pca
 
-
 def visualize_clusters(data, kmeans_model):
     """
     可視化用戶分群結果。
@@ -85,9 +84,9 @@ def visualize_clusters(data, kmeans_model):
         data['pca_1'], data['pca_2'], c=data['cluster'], cmap='viridis', alpha=0.7
     )
     plt.colorbar(scatter, label='分群')
-    plt.title("用戶分群結果")
-    plt.xlabel("PCA 組件 1")
-    plt.ylabel("PCA 組件 2")
+    plt.title("用戶分群結果", fontproperties=set_chinese_font())
+    plt.xlabel("PCA 組件 1", fontproperties=set_chinese_font())
+    plt.ylabel("PCA 組件 2", fontproperties=set_chinese_font())
     plt.show()
 
     # 顯示每個群的中心點
@@ -145,8 +144,10 @@ def run_user_clustering():
 
         # 分群統計
         cluster_summary = clustered_data.groupby('cluster').agg({
-            'reply_count': ['mean', 'sum', 'count']
-        })
+            'total_post_count': 'mean',
+            'total_reply_count': 'mean',
+            'author': 'count'
+        }).rename(columns={'author': 'user_count'})
         st.write("分群統計：", cluster_summary)
 
         # 視覺化
