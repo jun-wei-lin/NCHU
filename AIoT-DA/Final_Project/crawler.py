@@ -171,17 +171,74 @@ def scrape_keyword_trends(keyword, on_progress=None, timeout=10):
 
     return trend_data
 
-def fetch_user_data():
+def scrape_user_behavior(keyword, period, max_articles=100):
     """
-    從 PTT 獲取用戶數據，返回包含 user_id、post_count、reply_count、sentiment_score_avg 的 DataFrame
-    """
-    # 模擬從爬蟲中提取的數據，實際需與爬蟲邏輯集成
-    user_data = [
-        {"user_id": "user_1", "post_count": 15, "reply_count": 30, "sentiment_score_avg": 0.8},
-        {"user_id": "user_2", "post_count": 5, "reply_count": 10, "sentiment_score_avg": 0.6},
-        {"user_id": "user_3", "post_count": 25, "reply_count": 50, "sentiment_score_avg": 0.9},
-        {"user_id": "user_4", "post_count": 10, "reply_count": 20, "sentiment_score_avg": 0.7},
-    ]
+    爬取 PTT 八卦板的用戶行為數據，包含作者與回文數。
 
-    df = pd.DataFrame(user_data)
-    return df
+    Args:
+        keyword (str): 搜尋關鍵字
+        period (int): 搜尋期間（單位：月）
+        max_articles (int): 最大文章數量限制
+
+    Returns:
+        List[Dict]: 每篇文章的用戶行為數據列表
+    """
+    base_url = "https://www.ptt.cc"
+    url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
+    now_time = datetime.now() - relativedelta(months=period)
+    cookies = {'over18': '1'}
+    user_data = []
+
+    while url and len(user_data) < max_articles:
+        try:
+            web = requests.get(url, cookies=cookies)
+            web.raise_for_status()
+            soup = BeautifulSoup(web.text, "html.parser")
+            titles = soup.find_all('div', class_='title')
+            dates = soup.find_all('div', class_='date')
+
+            for i in range(len(titles)):
+                if titles[i].find('a'):
+                    date_text = dates[i].get_text().strip()
+                    try:
+                        article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
+                        if article_date >= now_time:
+                            link = base_url + titles[i].find('a')['href']
+
+                            # 爬取文章詳情
+                            article_response = requests.get(link, cookies=cookies)
+                            article_response.raise_for_status()
+                            article_soup = BeautifulSoup(article_response.text, "html.parser")
+                            author = article_soup.find('span', class_='article-meta-value')
+                            replies = article_soup.find_all('span', class_='push-tag')
+                            
+                            # 統計回文數量
+                            reply_count = len(replies)
+
+                            # 儲存用戶行為數據
+                            user_data.append({
+                                "author": author.text if author else "匿名用戶",
+                                "reply_count": reply_count,
+                                "date": article_date.strftime('%Y-%m-%d'),
+                            })
+
+                            # 超過最大文章數退出
+                            if len(user_data) >= max_articles:
+                                break
+                    except ValueError:
+                        continue
+
+            next_page = soup.find('a', string="‹ 上頁")
+            if next_page and 'href' in next_page.attrs:
+                url = base_url + next_page['href']
+            else:
+                break
+
+        except requests.RequestException as e:
+            print(f"HTTP 請求錯誤：{e}")
+            break
+        except Exception as e:
+            print(f"其他錯誤：{e}")
+            break
+
+    return user_data
