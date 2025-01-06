@@ -246,10 +246,9 @@ def run_user_clustering():
         )
 
         # 顯示分群統計摘要
-        st.write("分群統計摘要：")
+        st.subheader("分群統計摘要")
         st.write(cluster_summary)
 
         # 視覺化增強
         visualize_clusters_with_summary(clustered_data, cluster_summary, kmeans_model)
-
 
