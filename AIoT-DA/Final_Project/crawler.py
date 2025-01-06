@@ -173,7 +173,7 @@ def scrape_keyword_trends(keyword, on_progress=None, timeout=10):
 
 def scrape_user_behavior(keyword, period, on_progress=None, stop_signal=None):
     """
-    爬取 PTT 八卦板的用戶行為數據，包含作者與回文數，並支持即時停止功能。
+    爬取 PTT 八卦板的用戶行為數據，包含作者與回文數，支持即時停止功能。
 
     Args:
         keyword (str): 搜尋關鍵字
@@ -211,8 +211,12 @@ def scrape_user_behavior(keyword, period, on_progress=None, stop_signal=None):
                 if titles[i].find('a'):
                     date_text = dates[i].get_text().strip()
                     try:
-                        # 將文章日期轉為 datetime 格式
+                        # 處理跨年日期
                         article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
+                        if article_date > datetime.now():
+                            article_date = article_date.replace(year=article_date.year - 1)
+
+                        # 篩選符合期間的文章
                         if article_date >= now_time:
                             link = base_url + titles[i].find('a')['href']
 
