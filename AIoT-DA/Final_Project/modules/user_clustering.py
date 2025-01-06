@@ -34,7 +34,11 @@ def visualize_clusters(data):
 
     plt.figure(figsize=(8, 6))
     scatter = plt.scatter(reduced_features[:, 0], reduced_features[:, 1], c=data['cluster'], cmap='viridis')
-    plt.colorbar(scatter, label='分群', fontproperties=chinese_font)
+    
+    # 設置 colorbar 並修改字體
+    cbar = plt.colorbar(scatter)
+    cbar.set_label('分群', fontproperties=chinese_font)
+
     plt.title("用戶分群結果", fontproperties=chinese_font)
     plt.xlabel("PCA 組件 1", fontproperties=chinese_font)
     plt.ylabel("PCA 組件 2", fontproperties=chinese_font)
