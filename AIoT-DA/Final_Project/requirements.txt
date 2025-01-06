@@ -3,5 +3,12 @@ ckiptagger
 wordcloud
 requests
 beautifulsoup4
-tensorflow==2.18.0
 python-dateutil
+transformers
+torch
+pandas
+numpy
+matplotlib
+scikit-learn
+statsmodels
+tensorflow
