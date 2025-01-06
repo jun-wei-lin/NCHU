@@ -76,23 +76,61 @@ def visualize_clusters(data, kmeans_model):
     可視化用戶分群結果。
 
     Args:
+        data (DataFrame): 包含分def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
+    """
+    增強的用戶分群結果可視化，包括數據摘要和特徵分佈圖。
+
+    Args:
         data (DataFrame): 包含分群和 PCA 特徵的數據。
+        cluster_summary (DataFrame): 每個群的摘要數據（平均發文數、回文數、用戶數量）。
         kmeans_model (KMeans): KMeans 模型。
     """
+    import matplotlib.pyplot as plt
+
+    # 數據摘要表格
+    st.subheader("分群數據摘要")
+    st.write(cluster_summary)
+
+    # 可視化群內特徵分佈（柱狀圖）
+    st.subheader("各群平均特徵比較")
+    cluster_summary[['avg_post_count', 'avg_reply_count']].plot(
+        kind='bar', figsize=(8, 6), legend=True, alpha=0.8
+    )
+    plt.title("各群的平均發文數與回文數", fontproperties=set_chinese_font())
+    plt.xlabel("群集編號 (Cluster)", fontproperties=set_chinese_font())
+    plt.ylabel("數值 (平均數)", fontproperties=set_chinese_font())
+    st.pyplot(plt)
+
+    # 箱線圖：回文數分佈
+    st.subheader("回文數分佈（箱線圖）")
+    plt.figure(figsize=(8, 6))
+    data.boxplot(column='total_reply_count', by='cluster', grid=False)
+    plt.title("回文數分佈（按群）", fontproperties=set_chinese_font())
+    plt.suptitle("")  # 移除默認標題
+    plt.xlabel("群集編號 (Cluster)", fontproperties=set_chinese_font())
+    plt.ylabel("回文數", fontproperties=set_chinese_font())
+    st.pyplot(plt)
+
+    # 群內說明文字
+    st.subheader("分群數據的應用價值")
+    st.markdown("""
+    - **群 0**：以普通用戶為主，活躍度較低，可能是大部分用戶的行為模式。
+    - **群 1**：回文數明顯較高，這些用戶可能是社群的高互動參與者，對回應討論感興趣。
+    - **群 2**：活躍度最高，發文和回文數都非常高，可能是熱門話題的主要貢獻者或核心用戶。
+    """)
+
+    # 群內特徵分佈圖（PCA）
+    st.subheader("用戶分群結果可視化（PCA 降維）")
     plt.figure(figsize=(8, 6))
     scatter = plt.scatter(
         data['pca_1'], data['pca_2'], c=data['cluster'], cmap='viridis', alpha=0.7
     )
     plt.colorbar(scatter, label='分群')
-    plt.title("用戶分群結果", fontproperties=set_chinese_font())
+    plt.title("用戶行為分群結果（PCA 降維）", fontproperties=set_chinese_font())
     plt.xlabel("PCA 組件 1", fontproperties=set_chinese_font())
     plt.ylabel("PCA 組件 2", fontproperties=set_chinese_font())
-    plt.show()
+    st.pyplot(plt)
 
-    # 顯示每個群的中心點
-    cluster_centers = kmeans_model.cluster_centers_
-    print("每個群的中心點（標準化後）:")
-    print(cluster_centers)
 
 def run_user_clustering():
     """用戶分群分析流程"""
@@ -139,16 +177,22 @@ def run_user_clustering():
 
         # 分群分析
         st.info("正在執行用戶分群...")
-        clustered_data, kmeans_model, pca_model = perform_clustering(df)
-        st.success("分群完成！")
+        clustered_data, kmeans_model, _ = perform_clustering(df)
 
         # 分群統計
         cluster_summary = clustered_data.groupby('cluster').agg({
             'total_post_count': 'mean',
             'total_reply_count': 'mean',
             'author': 'count'
-        }).rename(columns={'author': 'user_count'})
-        st.write("分群統計：", cluster_summary)
+        }).rename(columns={'author': 'user_count'}).reset_index()
+        cluster_summary.rename(
+            columns={
+                'total_post_count': 'avg_post_count',
+                'total_reply_count': 'avg_reply_count'
+            },
+            inplace=True
+        )
 
-        # 視覺化
-        visualize_clusters(clustered_data, kmeans_model)
+        # 視覺化增強
+        visualize_clusters_with_summary(clustered_data, cluster_summary, kmeans_model)
+
