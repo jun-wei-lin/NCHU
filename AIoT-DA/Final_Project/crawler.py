@@ -195,7 +195,7 @@ def scrape_user_behavior(keyword, period, on_progress=None, stop_signal=None):
         # 檢查是否收到停止信號
         if stop_signal and stop_signal():
             if on_progress:
-                on_progress("爬取已中止。")
+                on_progress("爬取已中止，返回已爬取數據。")
             break
 
         try:
