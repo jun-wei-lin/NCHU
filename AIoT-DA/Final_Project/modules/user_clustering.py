@@ -88,13 +88,15 @@ def run_user_clustering():
         st.session_state.stop_signal = False
 
         if not user_data:
-            st.error("未能抓取到相關數據，請嘗試其他關鍵字或時間範圍。")
-            return
-
-        st.success(f"成功爬取 {len(user_data)} 篇文章！")
+            st.warning("爬取過程已中止，僅對部分數據進行分析。")
+        else:
+            st.success(f"成功爬取 {len(user_data)} 篇文章！")
 
         # 轉換為 DataFrame
         df = pd.DataFrame(user_data)
+        if df.empty:
+            st.error("未能獲取任何數據。請嘗試其他關鍵字或時間範圍。")
+            return
         df['post_count'] = 1  # 每篇文章計為一次發文
         st.write("用戶數據預覽：", df.head())
 
@@ -106,3 +108,4 @@ def run_user_clustering():
 
         # 可視化分群結果
         visualize_clusters(clustered_data)
+
