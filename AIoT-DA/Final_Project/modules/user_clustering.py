@@ -2,8 +2,19 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import os
 import streamlit as st
 from crawler import scrape_user_behavior  # 調用新增的爬蟲函數
+
+# 設定中文字體
+def set_chinese_font():
+    """設定 Matplotlib 的中文字體"""
+    current_dir = os.path.dirname(__file__)  # 當前模組所在目錄
+    font_path = os.path.join(current_dir, "../fonts/kaiu.ttf")  # 字體相對路徑
+    if not os.path.exists(font_path):
+        raise FileNotFoundError(f"字體文件未找到，請確認路徑是否正確：{font_path}")
+    return fm.FontProperties(fname=font_path)
 
 def perform_clustering(data, n_clusters=3):
     """執行 K-means 分群"""
@@ -18,12 +29,15 @@ def visualize_clusters(data):
     pca = PCA(n_components=2)
     reduced_features = pca.fit_transform(features)
 
+    # 設定中文字體
+    chinese_font = set_chinese_font()
+
     plt.figure(figsize=(8, 6))
     scatter = plt.scatter(reduced_features[:, 0], reduced_features[:, 1], c=data['cluster'], cmap='viridis')
-    plt.colorbar(scatter, label='Cluster')
-    plt.title("用戶分群結果")
-    plt.xlabel("PCA 組件 1")
-    plt.ylabel("PCA 組件 2")
+    plt.colorbar(scatter, label='分群')
+    plt.title("用戶分群結果", fontproperties=chinese_font)
+    plt.xlabel("PCA 組件 1", fontproperties=chinese_font)
+    plt.ylabel("PCA 組件 2", fontproperties=chinese_font)
     st.pyplot(plt)
 
 def run_user_clustering():
