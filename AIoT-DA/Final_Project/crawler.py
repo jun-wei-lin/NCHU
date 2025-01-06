@@ -171,14 +171,15 @@ def scrape_keyword_trends(keyword, on_progress=None, timeout=10):
 
     return trend_data
 
-def scrape_user_behavior(keyword, period, on_progress=None):
+def scrape_user_behavior(keyword, period, on_progress=None, stop_signal=None):
     """
-    爬取 PTT 八卦板的用戶行為數據，包含作者與回文數。
+    爬取 PTT 八卦板的用戶行為數據，包含作者與回文數，並支持即時停止功能。
 
     Args:
         keyword (str): 搜尋關鍵字
         period (int): 搜尋期間（單位：月）
         on_progress (function): 回調函數，用於顯示進度訊息
+        stop_signal (function): 回調函數，檢查是否有停止信號
 
     Returns:
         List[Dict]: 每篇文章的用戶行為數據列表
@@ -192,6 +193,12 @@ def scrape_user_behavior(keyword, period, on_progress=None):
     earliest_date = None  # 記錄最早日期
 
     while url:
+        # 檢查是否收到停止信號
+        if stop_signal and stop_signal():
+            if on_progress:
+                on_progress("爬取已中止。")
+            break
+
         try:
             # 爬取頁面
             response = requests.get(url, cookies=cookies)
@@ -257,4 +264,3 @@ def scrape_user_behavior(keyword, period, on_progress=None):
             break
 
     return user_data
-
