@@ -170,3 +170,18 @@ def scrape_keyword_trends(keyword, on_progress=None, timeout=10):
         on_progress(f"數據樣本：\n{trend_data.head()}")
 
     return trend_data
+
+def fetch_user_data():
+    """
+    從 PTT 獲取用戶數據，返回包含 user_id、post_count、reply_count、sentiment_score_avg 的 DataFrame
+    """
+    # 模擬從爬蟲中提取的數據，實際需與爬蟲邏輯集成
+    user_data = [
+        {"user_id": "user_1", "post_count": 15, "reply_count": 30, "sentiment_score_avg": 0.8},
+        {"user_id": "user_2", "post_count": 5, "reply_count": 10, "sentiment_score_avg": 0.6},
+        {"user_id": "user_3", "post_count": 25, "reply_count": 50, "sentiment_score_avg": 0.9},
+        {"user_id": "user_4", "post_count": 10, "reply_count": 20, "sentiment_score_avg": 0.7},
+    ]
+
+    df = pd.DataFrame(user_data)
+    return df
