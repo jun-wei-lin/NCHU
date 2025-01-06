@@ -182,7 +182,6 @@ def preprocess_data(data):
 
     return data
 
-
 def run_user_clustering():
     """用戶分群分析流程"""
     keyword = st.text_input("請輸入關鍵字：")
@@ -232,10 +231,6 @@ def run_user_clustering():
         st.info("數據預處理完成，開始用戶分群分析...")
         clustered_data, kmeans_model, _ = perform_clustering(df)
 
-        # 檢查分群後的數據摘要
-        st.write("分群後的數據摘要：")
-        st.write(clustered_data.describe())
-
         # 分群統計
         cluster_summary = clustered_data.groupby('cluster').agg({
             'total_post_count': 'mean',
@@ -249,6 +244,12 @@ def run_user_clustering():
             },
             inplace=True
         )
+
+        # 顯示分群統計摘要
         st.write("分群統計摘要：")
         st.write(cluster_summary)
+
+        # 視覺化增強
+        visualize_clusters_with_summary(clustered_data, cluster_summary, kmeans_model)
+
 
