@@ -189,7 +189,7 @@ def scrape_user_behavior(keyword, period, on_progress=None):
     cookies = {'over18': '1'}
     user_data = []
     article_count = 0
-    earliest_date = None  # 新增：記錄最早日期
+    earliest_date = None  # 記錄最早日期
 
     while url:
         try:
@@ -232,9 +232,12 @@ def scrape_user_behavior(keyword, period, on_progress=None):
 
                             article_count += 1
 
-                            # 更新進度
+                            # 更新進度，包含目前爬取到的文章時間
                             if on_progress:
-                                on_progress(f"已爬取 {article_count} 篇文章，日期範圍：{earliest_date.strftime('%Y-%m-%d')} 至 {datetime.now().strftime('%Y-%m-%d')}")
+                                on_progress(
+                                    f"已爬取 {article_count} 篇文章，目前爬取到的文章時間：{article_date.strftime('%Y-%m-%d')}，"
+                                    f"日期範圍：{earliest_date.strftime('%Y-%m-%d')} 至 {datetime.now().strftime('%Y-%m-%d')}"
+                                )
 
                     except ValueError:
                         continue
