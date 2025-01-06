@@ -60,20 +60,35 @@ def run_user_clustering():
     period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)
 
     if st.button("開始分析"):
-        st.info("正在抓取 PTT 數據...")
-
         # 初始化進度條和進度信息
         progress_bar = st.progress(0)
         progress_text = st.empty()
 
+        # 初始化停止信號
+        if "stop_signal" not in st.session_state:
+            st.session_state.stop_signal = False
+
+        # 停止按鈕
+        if st.button("停止爬取"):
+            st.session_state.stop_signal = True
+
+        # 回調函數：更新進度
         def update_progress(message):
             progress_text.text(message)
 
-        # 爬取數據
-        user_data = scrape_user_behavior(keyword, period, on_progress=update_progress)
+        # 回調函數：檢查停止信號
+        def check_stop_signal():
+            return st.session_state.stop_signal
+
+        # 開始爬取
+        st.info("正在抓取 PTT 數據...")
+        user_data = scrape_user_behavior(keyword, period, on_progress=update_progress, stop_signal=check_stop_signal)
+
+        # 清理停止信號
+        st.session_state.stop_signal = False
 
         if not user_data:
-            st.error("未能抓取到相關數據，請嘗試其他關鍵字。")
+            st.error("未能抓取到相關數據，請嘗試其他關鍵字或時間範圍。")
             return
 
         st.success(f"成功爬取 {len(user_data)} 篇文章！")
@@ -81,12 +96,6 @@ def run_user_clustering():
         # 轉換為 DataFrame
         df = pd.DataFrame(user_data)
         df['post_count'] = 1  # 每篇文章計為一次發文
-
-        # 檢查數據量
-        if df.shape[0] < 2:
-            st.warning("數據量不足，無法進行分群分析。請嘗試增加搜尋期間或更換關鍵字。")
-            return
-
         st.write("用戶數據預覽：", df.head())
 
         # 分群分析
@@ -94,10 +103,6 @@ def run_user_clustering():
         clustered_data, kmeans_model = perform_clustering(df)
         st.success("分群完成！")
         st.write("分群結果：", clustered_data)
-
-        # 可視化分群結果
-        visualize_clusters(clustered_data)
-
 
         # 可視化分群結果
         visualize_clusters(clustered_data)
