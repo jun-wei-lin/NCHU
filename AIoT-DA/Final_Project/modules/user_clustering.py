@@ -48,18 +48,29 @@ def run_user_clustering():
     """用戶分群分析流程"""
     keyword = st.text_input("請輸入關鍵字：")
     period = st.number_input("搜尋期間（月）", min_value=1, max_value=12, value=3)
-    max_articles = 100
 
     if st.button("開始分析"):
         st.info("正在抓取 PTT 數據...")
-        user_data = scrape_user_behavior(keyword, period, max_articles)
+
+        # 初始化進度條和進度信息
+        progress_bar = st.progress(0)
+        progress_text = st.empty()
+
+        def update_progress(message):
+            """更新進度文字和條"""
+            progress_text.text(message)
+            # 假設最大進度為 100 篇文章，按比例更新條
+            progress_bar.progress(min(100, len(user_data) / 100))
+
+        # 爬取數據
+        user_data = scrape_user_behavior(keyword, period, on_progress=update_progress)
 
         if not user_data:
             st.error("未能抓取到相關數據，請嘗試其他關鍵字。")
             return
 
-        st.success(f"成功抓取到 {len(user_data)} 篇文章！")
-        
+        st.success(f"成功爬取 {len(user_data)} 篇文章！")
+
         # 轉換為 DataFrame
         df = pd.DataFrame(user_data)
         df['post_count'] = 1  # 每篇文章計為一次發文
