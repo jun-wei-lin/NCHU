@@ -16,43 +16,76 @@ def set_chinese_font():
         raise FileNotFoundError(f"字體文件未找到，請確認路徑是否正確：{font_path}")
     return fm.FontProperties(fname=font_path)
 
-def perform_clustering(data, n_clusters=3):
+
+def perform_clustering(data, max_clusters=5):
     """
-    執行 K-means 分群。
-    根據數據樣本數動態調整分群數量，避免錯誤。
+    執行用戶分群並返回分群結果。
+
+    Args:
+        data (DataFrame): 包含用戶行為特徵的數據。
+        max_clusters (int): 最大分群數量，用於肘部法則。
+
+    Returns:
+        DataFrame: 包含分群結果的數據。
+        KMeans: 訓練完成的 KMeans 模型。
+        PCA: 主成分分析模型。
     """
+    # 標準化數據
     features = data[['post_count', 'reply_count']]
-    n_samples = features.shape[0]
+    scaler = StandardScaler()
+    scaled_features = scaler.fit_transform(features)
 
-    # 動態調整 n_clusters，確保 n_samples >= n_clusters
-    if n_samples < n_clusters:
-        n_clusters = max(1, n_samples)  # 至少分 1 群
+    # 肘部法則確定最佳分群數
+    inertia = []
+    for n in range(1, max_clusters + 1):
+        kmeans = KMeans(n_clusters=n, random_state=42)
+        kmeans.fit(scaled_features)
+        inertia.append(kmeans.inertia_)
 
+    # 可視化肘部法則
+    plt.figure(figsize=(6, 4))
+    plt.plot(range(1, max_clusters + 1), inertia, marker='o')
+    plt.title("肘部法則：分群數 vs. 惰性")
+    plt.xlabel("分群數 (k)")
+    plt.ylabel("惰性 (Inertia)")
+    plt.show()
+
+    # 選擇分群數（此處暫設為 3，建議根據肘部圖調整）
+    n_clusters = 3
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    data['cluster'] = kmeans.fit_predict(features)
-    return data, kmeans
+    data['cluster'] = kmeans.fit_predict(scaled_features)
 
-
-def visualize_clusters(data):
-    """視覺化分群結果"""
-    features = data[['post_count', 'reply_count']]
+    # 主成分分析 (PCA) 降維
     pca = PCA(n_components=2)
-    reduced_features = pca.fit_transform(features)
+    reduced_features = pca.fit_transform(scaled_features)
+    data['pca_1'] = reduced_features[:, 0]
+    data['pca_2'] = reduced_features[:, 1]
 
-    # 設定中文字體
-    chinese_font = set_chinese_font()
+    return data, kmeans, pca
 
+
+def visualize_clusters(data, kmeans_model):
+    """
+    可視化用戶分群結果。
+
+    Args:
+        data (DataFrame): 包含分群和 PCA 特徵的數據。
+        kmeans_model (KMeans): KMeans 模型。
+    """
     plt.figure(figsize=(8, 6))
-    scatter = plt.scatter(reduced_features[:, 0], reduced_features[:, 1], c=data['cluster'], cmap='viridis')
-    
-    # 設置 colorbar 並修改字體
-    cbar = plt.colorbar(scatter)
-    cbar.set_label('分群', fontproperties=chinese_font)
+    scatter = plt.scatter(
+        data['pca_1'], data['pca_2'], c=data['cluster'], cmap='viridis', alpha=0.7
+    )
+    plt.colorbar(scatter, label='分群')
+    plt.title("用戶分群結果")
+    plt.xlabel("PCA 組件 1")
+    plt.ylabel("PCA 組件 2")
+    plt.show()
 
-    plt.title("用戶分群結果", fontproperties=chinese_font)
-    plt.xlabel("PCA 組件 1", fontproperties=chinese_font)
-    plt.ylabel("PCA 組件 2", fontproperties=chinese_font)
-    st.pyplot(plt)
+    # 顯示每個群的中心點
+    cluster_centers = kmeans_model.cluster_centers_
+    print("每個群的中心點（標準化後）:")
+    print(cluster_centers)
 
 def run_user_clustering():
     """用戶分群分析流程"""
@@ -64,11 +97,10 @@ def run_user_clustering():
         progress_bar = st.progress(0)
         progress_text = st.empty()
 
-        # 初始化停止信號
+        # 停止信號
         if "stop_signal" not in st.session_state:
             st.session_state.stop_signal = False
 
-        # 停止按鈕
         stop_button = st.button("停止爬取")
         if stop_button:
             st.session_state.stop_signal = True
@@ -88,24 +120,26 @@ def run_user_clustering():
         # 清理停止信號
         st.session_state.stop_signal = False
 
-        # 確認已爬取的數據是否可用
         if not user_data:
             st.error("未能獲取足夠的數據。請嘗試其他關鍵字或時間範圍。")
             return
 
         st.success(f"已完成爬取 {len(user_data)} 篇文章，正在進行分析...")
 
-        # 轉換為 DataFrame
+        # 數據轉換
         df = pd.DataFrame(user_data)
         df['post_count'] = 1  # 每篇文章計為一次發文
-        st.write("用戶數據預覽：", df.head())
 
         # 分群分析
         st.info("正在執行用戶分群...")
-        clustered_data, kmeans_model = perform_clustering(df)
+        clustered_data, kmeans_model, pca_model = perform_clustering(df)
         st.success("分群完成！")
-        st.write("分群結果：", clustered_data)
 
-        # 可視化分群結果
-        visualize_clusters(clustered_data)
+        # 分群統計
+        cluster_summary = clustered_data.groupby('cluster').agg({
+            'reply_count': ['mean', 'sum', 'count']
+        })
+        st.write("分群統計：", cluster_summary)
 
+        # 視覺化
+        visualize_clusters(clustered_data, kmeans_model)
