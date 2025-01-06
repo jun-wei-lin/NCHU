@@ -98,76 +98,75 @@ def scrape_keyword_trends(keyword, on_progress=None, timeout=10):
     url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
     cookies = {'over18': '1'}
     trends = {}
-    start_time = datetime.now() - relativedelta(years=1)  # 起始時間：過去一年
-    page_count = 0  # 記錄頁數
+
+    # 設定起始時間
+    start_time = datetime.now() - relativedelta(years=1)
 
     while url:
         try:
-            max_retries = 3
-            retries = max_retries
-            while retries > 0:
-                try:
-                    response = requests.get(url, cookies=cookies, timeout=timeout)
-                    response.raise_for_status()
-                    break
-                except requests.RequestException as e:
-                    retries -= 1
-                    if retries == 0:
-                        if on_progress:
-                            on_progress(f"HTTP 請求錯誤，已重試 {max_retries} 次仍失敗：{e}")
-                        return pd.DataFrame(columns=["month", "value"])
-                    sleep(1)
-
+            response = requests.get(url, cookies=cookies, timeout=timeout)
+            response.raise_for_status()
             soup = BeautifulSoup(response.text, "html.parser")
+
+            # 抓取文章標題與日期
             titles = soup.find_all('div', class_='title')
             dates = soup.find_all('div', class_='date')
 
             for i in range(len(titles)):
                 if titles[i].find('a'):
                     date_text = dates[i].get_text().strip()
+
+                    # 檢查日期格式
                     if not re.match(r"^\d{1,2}/\d{1,2}$", date_text):
                         if on_progress:
                             on_progress(f"日期格式錯誤，跳過文章：{date_text}")
                         continue
+
                     try:
                         article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
+
+                        # 處理年份翻轉問題
                         if article_date > datetime.now():
                             article_date = article_date.replace(year=article_date.year - 1)
+
                         if article_date < start_time:
                             if on_progress:
                                 on_progress("已超過設定的起始時間範圍，停止爬取。")
                             return pd.DataFrame(list(trends.items()), columns=["month", "value"])
-                        month_str = article_date.strftime("%Y-%m")
+
+                        month_str = article_date.strftime("%Y-%m")  # 按月累計
                         trends[month_str] = trends.get(month_str, 0) + 1
-                    except ValueError as e:
+
+                    except ValueError:
                         if on_progress:
-                            on_progress(f"日期解析失敗，跳過文章：{date_text} ({e})")
+                            on_progress(f"日期解析失敗，跳過文章：{date_text}")
                         continue
 
-            page_count += 1
+            # 更新進度
             if on_progress:
-                on_progress(f"目前已爬取第 {page_count} 頁數據，範圍：{list(trends.keys())[-5:]}")
+                elapsed_months = (datetime.now().year - article_date.year) * 12 + (datetime.now().month - article_date.month)
+                on_progress(f"目前已爬取到過去第 {elapsed_months} 個月的數據...")
 
+            # 進入下一頁
             next_page = soup.find('a', string="‹ 上頁")
             if next_page and 'href' in next_page.attrs:
                 url = base_url + next_page['href']
             else:
                 break
 
-        except Exception as e:
+        except requests.RequestException as e:
             if on_progress:
-                on_progress(f"其他錯誤：{e}")
+                on_progress(f"HTTP 請求錯誤：{e}")
             break
 
+    # 將結果轉換為 DataFrame
     trend_data = pd.DataFrame(list(trends.items()), columns=["month", "value"])
-    trend_data["month"] = pd.to_datetime(trend_data["month"], errors="coerce")
-    trend_data = trend_data.dropna()
+    trend_data["month"] = pd.to_datetime(trend_data["month"])
     trend_data.sort_values(by="month", inplace=True)
-    trend_data = trend_data.drop_duplicates(subset="month")
 
+    # 完成通知
     if on_progress:
         on_progress(f"爬取完成！數據範圍：{trend_data['month'].min()} 到 {trend_data['month'].max()}")
-        on_progress(f"數據樣本：\n{trend_data.head()}")
 
     return trend_data
 
