@@ -142,10 +142,6 @@ elif option == "趨勢預測":
 elif option == "用戶行為分析":
     st.title("用戶行為分析模組")
     st.write("此模組將分析 PTT 用戶發文行為模式與特性。")
-    
-    # 載入所需模組
-    from modules.user_clustering import run_user_clustering
-    
     # 執行用戶分群功能
     run_user_clustering()
 
