@@ -69,7 +69,8 @@ def run_user_clustering():
             st.session_state.stop_signal = False
 
         # 停止按鈕
-        if st.button("停止爬取"):
+        stop_button = st.button("停止爬取")
+        if stop_button:
             st.session_state.stop_signal = True
 
         # 回調函數：更新進度
