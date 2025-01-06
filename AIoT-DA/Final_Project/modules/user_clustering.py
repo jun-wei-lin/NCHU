@@ -41,6 +41,16 @@ def perform_clustering(data, max_clusters=5):
     user_stats[['scaled_post_count', 'scaled_reply_count']] = scaler.fit_transform(
         user_stats[['total_post_count', 'total_reply_count']]
     )
+    # 檢查樣本數並調整分群數
+    n_samples = user_stats.shape[0]
+    if n_samples < 2:
+        st.warning("樣本數過少，無法進行分群分析。請嘗試延長搜尋日期或更改關鍵字。")
+        return pd.DataFrame(), None, None
+
+    if n_samples < max_clusters:
+        max_clusters = n_samples
+        st.warning(f"樣本數（{n_samples}）少於設定的最大分群數，已自動調整分群數為 {max_clusters}。")
+
 
     # Step 3: 肘部法則確定最佳分群數
     inertia = []
@@ -227,16 +237,21 @@ def run_user_clustering():
         df['post_count'] = 1  # 每篇文章計為一次發文
 
         # **新增：檢查樣本數量**
-        if len(df) < 2:  # 需要至少兩個樣本進行分群
+        if len(df) < 2:
             st.warning("數據樣本數過少，無法進行有效分群分析。請嘗試延長搜尋期間或更改關鍵字。")
             return
-
+            
         df = preprocess_data(df)  # 處理極端值
 
         # 分群分析
         st.info("數據預處理完成，開始用戶分群分析...")
         clustered_data, kmeans_model, _ = perform_clustering(df)
 
+        # 如果分群結果為空，提示用戶並結束
+        if clustered_data.empty:
+            st.warning("分群結果不可用，請嘗試增加搜尋期間或更改關鍵字。")
+            return
+            
         # 分群統計
         cluster_summary = clustered_data.groupby('cluster').agg({
             'total_post_count': 'mean',
