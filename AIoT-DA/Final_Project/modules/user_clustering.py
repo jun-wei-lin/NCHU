@@ -156,6 +156,26 @@ def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
     st.pyplot(plt)
 
 
+def preprocess_data(data):
+    """
+    預處理數據，處理極端值，並返回處理後的數據。
+    Args:
+        data (DataFrame): 包含用戶行為特徵的原始數據。
+    Returns:
+        DataFrame: 預處理後的數據。
+    """
+    # 處理極端值：回文數
+    mean_reply = data['reply_count'].mean()
+    std_reply = data['reply_count'].std()
+    threshold_upper = mean_reply + 3 * std_reply  # 設置上限為均值 + 3倍標準差
+    data['reply_count'] = data['reply_count'].clip(upper=threshold_upper)
+
+    # 處理極端值後的統計信息
+    st.write("極端值處理後數據摘要：")
+    st.write(data.describe())
+
+    return data
+
 def run_user_clustering():
     """用戶分群分析流程"""
     keyword = st.text_input("請輸入關鍵字：")
@@ -195,9 +215,10 @@ def run_user_clustering():
 
         st.success(f"已完成爬取 {len(user_data)} 篇文章，正在進行分析...")
 
-        # 數據轉換
+        # 數據預處理
         df = pd.DataFrame(user_data)
         df['post_count'] = 1  # 每篇文章計為一次發文
+        df = preprocess_data(df)  # 處理極端值
 
         # 分群分析
         st.info("正在執行用戶分群...")
@@ -219,4 +240,3 @@ def run_user_clustering():
 
         # 視覺化增強
         visualize_clusters_with_summary(clustered_data, cluster_summary, kmeans_model)
-
