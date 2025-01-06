@@ -17,11 +17,21 @@ def set_chinese_font():
     return fm.FontProperties(fname=font_path)
 
 def perform_clustering(data, n_clusters=3):
-    """執行 K-means 分群"""
+    """
+    執行 K-means 分群。
+    根據數據樣本數動態調整分群數量，避免錯誤。
+    """
     features = data[['post_count', 'reply_count']]
+    n_samples = features.shape[0]
+
+    # 動態調整 n_clusters，確保 n_samples >= n_clusters
+    if n_samples < n_clusters:
+        n_clusters = max(1, n_samples)  # 至少分 1 群
+
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     data['cluster'] = kmeans.fit_predict(features)
     return data, kmeans
+
 
 def visualize_clusters(data):
     """視覺化分群結果"""
@@ -57,10 +67,7 @@ def run_user_clustering():
         progress_text = st.empty()
 
         def update_progress(message):
-            """更新進度文字和條"""
             progress_text.text(message)
-            # 假設最大進度為 100 篇文章，按比例更新條
-            progress_bar.progress(min(100, len(user_data) / 100))
 
         # 爬取數據
         user_data = scrape_user_behavior(keyword, period, on_progress=update_progress)
@@ -74,6 +81,12 @@ def run_user_clustering():
         # 轉換為 DataFrame
         df = pd.DataFrame(user_data)
         df['post_count'] = 1  # 每篇文章計為一次發文
+
+        # 檢查數據量
+        if df.shape[0] < 2:
+            st.warning("數據量不足，無法進行分群分析。請嘗試增加搜尋期間或更換關鍵字。")
+            return
+
         st.write("用戶數據預覽：", df.head())
 
         # 分群分析
@@ -81,6 +94,10 @@ def run_user_clustering():
         clustered_data, kmeans_model = perform_clustering(df)
         st.success("分群完成！")
         st.write("分群結果：", clustered_data)
+
+        # 可視化分群結果
+        visualize_clusters(clustered_data)
+
 
         # 可視化分群結果
         visualize_clusters(clustered_data)
