@@ -2,6 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
+from user_clustering import run_user_clustering  # 調用用戶分群模組
 
 # 定義主題與頁籤
 st.set_page_config(page_title="智慧社群洞察與熱門話題分析平台", layout="wide")
