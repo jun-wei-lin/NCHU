@@ -225,6 +225,12 @@ def run_user_clustering():
         st.info("正在進行數據預處理（包括極端值處理）...")
         df = pd.DataFrame(user_data)
         df['post_count'] = 1  # 每篇文章計為一次發文
+
+        # **新增：檢查樣本數量**
+        if len(df) < 2:  # 需要至少兩個樣本進行分群
+            st.warning("數據樣本數過少，無法進行有效分群分析。請嘗試延長搜尋期間或更改關鍵字。")
+            return
+
         df = preprocess_data(df)  # 處理極端值
 
         # 分群分析
