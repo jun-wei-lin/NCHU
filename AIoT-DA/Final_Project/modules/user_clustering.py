@@ -86,6 +86,14 @@ def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
     st.subheader("分群數據摘要")
     st.write(cluster_summary)
 
+    # 群內說明文字
+    st.subheader("分群數據的應用價值")
+    st.markdown("""
+    - **群 0**：以普通用戶為主，活躍度較低，可能是大部分用戶的行為模式。
+    - **群 1**：回文數明顯較高，這些用戶可能是社群的高互動參與者，對回應討論感興趣。
+    - **群 2**：活躍度最高，發文和回文數都非常高，可能是熱門話題的主要貢獻者或核心用戶。
+    """)
+    
     # 可視化群內特徵分佈（柱狀圖）
     st.subheader("各群平均特徵比較")
     cluster_summary[['avg_post_count', 'avg_reply_count']].plot(
@@ -119,14 +127,6 @@ def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
     plt.xlabel("群集編號 (Cluster)", fontproperties=set_chinese_font())
     plt.ylabel("回文數", fontproperties=set_chinese_font())
     st.pyplot(plt)
-
-    # 群內說明文字
-    st.subheader("分群數據的應用價值")
-    st.markdown("""
-    - **群 0**：以普通用戶為主，活躍度較低，可能是大部分用戶的行為模式。
-    - **群 1**：回文數明顯較高，這些用戶可能是社群的高互動參與者，對回應討論感興趣。
-    - **群 2**：活躍度最高，發文和回文數都非常高，可能是熱門話題的主要貢獻者或核心用戶。
-    """)
 
     # 群內特徵分佈圖（PCA）
     st.subheader("用戶分群結果可視化（PCA 降維）")
