@@ -71,12 +71,7 @@ def perform_clustering(data, max_clusters=5):
 
     return user_stats, kmeans, pca
 
-def visualize_clusters(data, kmeans_model):
-    """
-    可視化用戶分群結果。
-
-    Args:
-        data (DataFrame): 包含分def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
+def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
     """
     增強的用戶分群結果可視化，包括數據摘要和特徵分佈圖。
 
@@ -130,7 +125,6 @@ def visualize_clusters(data, kmeans_model):
     plt.xlabel("PCA 組件 1", fontproperties=set_chinese_font())
     plt.ylabel("PCA 組件 2", fontproperties=set_chinese_font())
     st.pyplot(plt)
-
 
 def run_user_clustering():
     """用戶分群分析流程"""
