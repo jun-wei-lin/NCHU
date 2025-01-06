@@ -98,6 +98,20 @@ def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
 
     # 箱線圖：回文數分佈
     st.subheader("回文數分佈（箱線圖）")
+    st.markdown("""
+    ### 箱線圖的意義：
+    - 箱線圖展示了各群回文數的分佈情況。
+    - 其中：
+      - 箱體代表數據的 **四分位範圍 (IQR)**。
+      - 箱體內的線代表數據的 **中位數**。
+      - 箱體外的點代表數據中的 **異常值 (outliers)**。
+    ### 觀看方式：
+    - **群集編號 (X 軸)** 表示不同用戶群。
+    - **回文數 (Y 軸)** 表示該群用戶的回文行為數據。
+    - 可以觀察：
+      - **群間的回文數分佈差異**。
+      - 是否存在某些群有極高或極低的異常值。
+    """)
     plt.figure(figsize=(8, 6))
     data.boxplot(column='total_reply_count', by='cluster', grid=False)
     plt.title("回文數分佈（按群）", fontproperties=set_chinese_font())
@@ -116,15 +130,28 @@ def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
 
     # 群內特徵分佈圖（PCA）
     st.subheader("用戶分群結果可視化（PCA 降維）")
+    st.markdown("""
+    ### PCA 降維圖的意義：
+    - PCA 降維圖通過將高維數據壓縮到 2 維，展示各群用戶的分佈情況。
+    - 每個點表示一位用戶，點的顏色對應該用戶所屬的群。
+    - X 軸和 Y 軸分別表示數據在第一主成分 (PCA 組件 1) 和第二主成分 (PCA 組件 2) 上的投影。
+    ### 觀看方式：
+    - **群集 (顏色區分)**：顏色對應用戶的分群結果。
+    - **點的位置 (分佈)**：表示用戶行為的特徵相似性，距離越近的點表明用戶行為越相似。
+    - 可觀察：
+      - **各群是否有明顯分界**（不同顏色的點是否聚集）。
+      - 某些群是否存在異常行為（例如遠離其他點的用戶）。
+    """)
     plt.figure(figsize=(8, 6))
     scatter = plt.scatter(
         data['pca_1'], data['pca_2'], c=data['cluster'], cmap='viridis', alpha=0.7
     )
-    plt.colorbar(scatter, label='分群')
+    plt.colorbar(scatter, label='分群標籤 (群集編號)', fontproperties=set_chinese_font())
     plt.title("用戶行為分群結果（PCA 降維）", fontproperties=set_chinese_font())
     plt.xlabel("PCA 組件 1", fontproperties=set_chinese_font())
     plt.ylabel("PCA 組件 2", fontproperties=set_chinese_font())
     st.pyplot(plt)
+
 
 def run_user_clustering():
     """用戶分群分析流程"""
