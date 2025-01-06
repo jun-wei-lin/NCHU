@@ -155,7 +155,6 @@ def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
     plt.ylabel("PCA 組件 2", fontproperties=set_chinese_font())
     st.pyplot(plt)
 
-
 def preprocess_data(data):
     """
     預處理數據，處理極端值，並返回處理後的數據。
@@ -164,17 +163,25 @@ def preprocess_data(data):
     Returns:
         DataFrame: 預處理後的數據。
     """
-    # 處理極端值：回文數
+    # 設置極端值篩選的上限（均值 + 3 * 標準差）
     mean_reply = data['reply_count'].mean()
     std_reply = data['reply_count'].std()
-    threshold_upper = mean_reply + 3 * std_reply  # 設置上限為均值 + 3倍標準差
+    threshold_upper = mean_reply + 3 * std_reply
+
+    # 統計極端值前的數據分佈
+    st.write("處理前的回文數摘要：")
+    st.write(data['reply_count'].describe())
+
+    # 處理極端值
     data['reply_count'] = data['reply_count'].clip(upper=threshold_upper)
 
-    # 處理極端值後的統計信息
-    st.write("極端值處理後數據摘要：")
-    st.write(data.describe())
+    # 統計處理後的數據分佈
+    st.write(f"已將回文數的極端值截斷至上限 {threshold_upper:.2f}。")
+    st.write("處理後的回文數摘要：")
+    st.write(data['reply_count'].describe())
 
     return data
+
 
 def run_user_clustering():
     """用戶分群分析流程"""
@@ -216,13 +223,18 @@ def run_user_clustering():
         st.success(f"已完成爬取 {len(user_data)} 篇文章，正在進行分析...")
 
         # 數據預處理
+        st.info("正在進行數據預處理（包括極端值處理）...")
         df = pd.DataFrame(user_data)
         df['post_count'] = 1  # 每篇文章計為一次發文
         df = preprocess_data(df)  # 處理極端值
 
         # 分群分析
-        st.info("正在執行用戶分群...")
+        st.info("數據預處理完成，開始用戶分群分析...")
         clustered_data, kmeans_model, _ = perform_clustering(df)
+
+        # 檢查分群後的數據摘要
+        st.write("分群後的數據摘要：")
+        st.write(clustered_data.describe())
 
         # 分群統計
         cluster_summary = clustered_data.groupby('cluster').agg({
@@ -237,6 +249,6 @@ def run_user_clustering():
             },
             inplace=True
         )
+        st.write("分群統計摘要：")
+        st.write(cluster_summary)
 
-        # 視覺化增強
-        visualize_clusters_with_summary(clustered_data, cluster_summary, kmeans_model)
