@@ -147,18 +147,27 @@ elif option == "用戶行為分析":
     
     from user_behavior_analysis import main as behavior_analysis_main
     
-    # 其他 Streamlit 頁面代碼
-    if menu_option == "User Behavior Analysis":
-        behavior_analysis_main()
-
-elif option == "個性化推薦":
-    st.title("個性化推薦模組")
-    st.write("此模組將根據您的興趣推薦相關文章或話題。")
-    # 暫時占位，未整合功能
-elif option == "文本摘要":
-    st.title("文本摘要模組")
-    st.write("此模組將為每篇文章生成簡短摘要，幫助快速掌握重點。")
-
-
+    # 定義選單選項
+    menu_options = ["首頁", "使用者行為分析", "其他功能"]
+    menu_option = st.sidebar.selectbox("選擇頁面：", menu_options)
+    
+    # 根據選單選項執行不同的頁面功能
+    if menu_option == "首頁":
+        st.title("歡迎來到應用程式")
+        st.write("這是首頁，您可以在這裡顯示一般資訊。")
+    
+    elif menu_option == "使用者行為分析":
+        behavior_analysis_main()  # 執行使用者行為分析的主功能
+    
+    elif menu_option == "其他功能":
+        st.write("這是其他功能頁面，您可以在這裡擴展更多內容。")
+    
+    elif option == "個性化推薦":
+        st.title("個性化推薦模組")
+        st.write("此模組將根據您的興趣推薦相關文章或話題。")
+        # 暫時占位，未整合功能
+    elif option == "文本摘要":
+        st.title("文本摘要模組")
+        st.write("此模組將為每篇文章生成簡短摘要，幫助快速掌握重點。")
 
     # 暫時占位，未整合功能
