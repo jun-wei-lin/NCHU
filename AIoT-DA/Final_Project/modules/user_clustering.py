@@ -146,7 +146,10 @@ def visualize_clusters_with_summary(data, cluster_summary, kmeans_model):
     scatter = plt.scatter(
         data['pca_1'], data['pca_2'], c=data['cluster'], cmap='viridis', alpha=0.7
     )
-    plt.colorbar(scatter, label='分群標籤 (群集編號)', fontproperties=set_chinese_font())
+    # 設置 colorbar 並調整字體
+    cbar = plt.colorbar(scatter)
+    cbar.set_label('分群標籤 (群集編號)', fontproperties=set_chinese_font())
+    
     plt.title("用戶行為分群結果（PCA 降維）", fontproperties=set_chinese_font())
     plt.xlabel("PCA 組件 1", fontproperties=set_chinese_font())
     plt.ylabel("PCA 組件 2", fontproperties=set_chinese_font())
