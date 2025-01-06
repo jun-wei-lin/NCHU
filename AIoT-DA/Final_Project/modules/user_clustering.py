@@ -87,16 +87,15 @@ def run_user_clustering():
         # 清理停止信號
         st.session_state.stop_signal = False
 
+        # 確認已爬取的數據是否可用
         if not user_data:
-            st.warning("爬取過程已中止，僅對部分數據進行分析。")
-        else:
-            st.success(f"成功爬取 {len(user_data)} 篇文章！")
+            st.error("未能獲取足夠的數據。請嘗試其他關鍵字或時間範圍。")
+            return
+
+        st.success(f"已完成爬取 {len(user_data)} 篇文章，正在進行分析...")
 
         # 轉換為 DataFrame
         df = pd.DataFrame(user_data)
-        if df.empty:
-            st.error("未能獲取任何數據。請嘗試其他關鍵字或時間範圍。")
-            return
         df['post_count'] = 1  # 每篇文章計為一次發文
         st.write("用戶數據預覽：", df.head())
 
