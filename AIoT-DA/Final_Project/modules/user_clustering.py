@@ -6,6 +6,7 @@ import matplotlib.font_manager as fm
 import os
 import streamlit as st
 from crawler import scrape_user_behavior  # 調用新增的爬蟲函數
+from sklearn.preprocessing import StandardScaler
 
 # 設定中文字體
 def set_chinese_font():
@@ -30,16 +31,23 @@ def perform_clustering(data, max_clusters=5):
         KMeans: 訓練完成的 KMeans 模型。
         PCA: 主成分分析模型。
     """
-    # 標準化數據
-    features = data[['post_count', 'reply_count']]
-    scaler = StandardScaler()
-    scaled_features = scaler.fit_transform(features)
+    # Step 1: 重新計算用戶的總發文數和回文數
+    user_stats = data.groupby('author').agg(
+        total_post_count=('post_count', 'count'),
+        total_reply_count=('reply_count', 'sum')
+    ).reset_index()
 
-    # 肘部法則確定最佳分群數
+    # Step 2: 標準化數據
+    scaler = StandardScaler()
+    user_stats[['scaled_post_count', 'scaled_reply_count']] = scaler.fit_transform(
+        user_stats[['total_post_count', 'total_reply_count']]
+    )
+
+    # Step 3: 肘部法則確定最佳分群數
     inertia = []
     for n in range(1, max_clusters + 1):
         kmeans = KMeans(n_clusters=n, random_state=42)
-        kmeans.fit(scaled_features)
+        kmeans.fit(user_stats[['scaled_post_count', 'scaled_reply_count']])
         inertia.append(kmeans.inertia_)
 
     # 可視化肘部法則
@@ -50,18 +58,18 @@ def perform_clustering(data, max_clusters=5):
     plt.ylabel("惰性 (Inertia)")
     plt.show()
 
-    # 選擇分群數（此處暫設為 3，建議根據肘部圖調整）
-    n_clusters = 3
+    # Step 4: K-means 分群
+    n_clusters = 3  # 可根據肘部法則調整
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    data['cluster'] = kmeans.fit_predict(scaled_features)
+    user_stats['cluster'] = kmeans.fit_predict(user_stats[['scaled_post_count', 'scaled_reply_count']])
 
-    # 主成分分析 (PCA) 降維
+    # Step 5: 主成分分析 (PCA) 降維
     pca = PCA(n_components=2)
-    reduced_features = pca.fit_transform(scaled_features)
-    data['pca_1'] = reduced_features[:, 0]
-    data['pca_2'] = reduced_features[:, 1]
+    reduced_features = pca.fit_transform(user_stats[['scaled_post_count', 'scaled_reply_count']])
+    user_stats['pca_1'] = reduced_features[:, 0]
+    user_stats['pca_2'] = reduced_features[:, 1]
 
-    return data, kmeans, pca
+    return user_stats, kmeans, pca
 
 
 def visualize_clusters(data, kmeans_model):
