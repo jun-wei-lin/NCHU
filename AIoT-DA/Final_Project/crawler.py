@@ -171,14 +171,14 @@ def scrape_keyword_trends(keyword, on_progress=None, timeout=10):
 
     return trend_data
 
-def scrape_user_behavior(keyword, period, max_articles=100):
+def scrape_user_behavior(keyword, period, on_progress=None):
     """
     爬取 PTT 八卦板的用戶行為數據，包含作者與回文數。
 
     Args:
         keyword (str): 搜尋關鍵字
         period (int): 搜尋期間（單位：月）
-        max_articles (int): 最大文章數量限制
+        on_progress (function): 回調函數，用於顯示進度訊息
 
     Returns:
         List[Dict]: 每篇文章的用戶行為數據列表
@@ -188,12 +188,14 @@ def scrape_user_behavior(keyword, period, max_articles=100):
     now_time = datetime.now() - relativedelta(months=period)
     cookies = {'over18': '1'}
     user_data = []
+    article_count = 0
 
-    while url and len(user_data) < max_articles:
+    while url:
         try:
-            web = requests.get(url, cookies=cookies)
-            web.raise_for_status()
-            soup = BeautifulSoup(web.text, "html.parser")
+            # 爬取頁面
+            response = requests.get(url, cookies=cookies)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
             titles = soup.find_all('div', class_='title')
             dates = soup.find_all('div', class_='date')
 
@@ -201,6 +203,7 @@ def scrape_user_behavior(keyword, period, max_articles=100):
                 if titles[i].find('a'):
                     date_text = dates[i].get_text().strip()
                     try:
+                        # 將文章日期轉為 datetime 格式
                         article_date = datetime(datetime.now().year, *map(int, date_text.split('/')))
                         if article_date >= now_time:
                             link = base_url + titles[i].find('a')['href']
@@ -211,7 +214,7 @@ def scrape_user_behavior(keyword, period, max_articles=100):
                             article_soup = BeautifulSoup(article_response.text, "html.parser")
                             author = article_soup.find('span', class_='article-meta-value')
                             replies = article_soup.find_all('span', class_='push-tag')
-                            
+
                             # 統計回文數量
                             reply_count = len(replies)
 
@@ -222,12 +225,16 @@ def scrape_user_behavior(keyword, period, max_articles=100):
                                 "date": article_date.strftime('%Y-%m-%d'),
                             })
 
-                            # 超過最大文章數退出
-                            if len(user_data) >= max_articles:
-                                break
+                            article_count += 1
+
+                            # 更新進度
+                            if on_progress:
+                                on_progress(f"已爬取 {article_count} 篇文章，日期範圍：{now_time.date()} 至 {datetime.now().date()}")
+
                     except ValueError:
                         continue
 
+            # 找到下一頁
             next_page = soup.find('a', string="‹ 上頁")
             if next_page and 'href' in next_page.attrs:
                 url = base_url + next_page['href']
@@ -242,3 +249,4 @@ def scrape_user_behavior(keyword, period, max_articles=100):
             break
 
     return user_data
+
