@@ -186,11 +186,10 @@ def scrape_user_behavior(keyword, period, on_progress=None, stop_signal=None):
     """
     base_url = "https://www.ptt.cc"
     url = f"{base_url}/bbs/Gossiping/search?q={keyword}"
-    now_time = datetime.now() - relativedelta(months=period)
+    now_time = datetime.now() - relativedelta(months=period)  # 搜尋期間的最早日期
     cookies = {'over18': '1'}
     user_data = []
     article_count = 0
-    earliest_date = None  # 記錄最早日期
 
     while url:
         # 檢查是否收到停止信號
@@ -237,17 +236,13 @@ def scrape_user_behavior(keyword, period, on_progress=None, stop_signal=None):
                                 "date": article_date.strftime('%Y-%m-%d'),
                             })
 
-                            # 更新最早日期
-                            if earliest_date is None or article_date < earliest_date:
-                                earliest_date = article_date
-
                             article_count += 1
 
-                            # 更新進度，包含目前爬取到的文章時間
+                            # 更新進度，包含目前爬取到的文章時間和搜尋期間的最早日期
                             if on_progress:
                                 on_progress(
                                     f"已爬取 {article_count} 篇文章，目前爬取到的文章時間：{article_date.strftime('%Y-%m-%d')}，"
-                                    f"日期範圍：{earliest_date.strftime('%Y-%m-%d')} 至 {datetime.now().strftime('%Y-%m-%d')}"
+                                    f"搜尋範圍最早日期：{now_time.strftime('%Y-%m-%d')}"
                                 )
 
                     except ValueError:
