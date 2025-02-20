@@ -23,3 +23,24 @@
 
   老師: 全體教師 All
 
+## 碩一下學期 所修的課 114/2/20
+
+- 高等人工智慧 Advanced Artificial Intelligence
+  
+  老師: 陳奕中 Yi-Chung Chen
+
+- 嵌入式系統原理與應用 Embedded System Principle and Application
+
+  老師: 張延任 CHANG,YEN-JEN
+
+- 深度強化學習 Deep Reinforcement Learning
+
+  老師: 陳煥 HUAN CHEN
+
+- 計算機網路 Computer Networks
+
+  老師: 王丕中 WANG, PI CHUNG
+
+- 碩士論文 Thesis
+
+  老師: 全體教師 All
