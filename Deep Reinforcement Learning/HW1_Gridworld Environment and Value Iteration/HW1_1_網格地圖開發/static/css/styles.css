@@ -1,0 +1,119 @@
+/* 全域樣式 */
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 標題與表單 */
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input[type="number"] {
+    padding: 8px;
+    width: 60px;
+    margin-right: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* 模式選擇與狀態資訊 */
+#modeSelector {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#modeSelector label {
+    margin: 0 10px;
+    font-weight: 500;
+}
+
+#status {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* 網格表格樣式 */
+table {
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+td {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ddd;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+td:hover {
+    transform: scale(1.05);
+}
+
+/* 各狀態格子 */
+.empty {
+    background-color: #fff;
+}
+.start {
+    background-color: #28a745; /* 綠色 */
+}
+.end {
+    background-color: #dc3545; /* 紅色 */
+}
+.obstacle {
+    background-color: #6c757d; /* 灰色 */
+}
+
+/* 重設按鈕 */
+#resetButton {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#resetButton:hover {
+    background-color: #e0a800;
+}
