@@ -44,9 +44,15 @@
 
 ### 安裝與執行
 
-1. **Clone 專案**
+```bash
+  pip install flask
+```
+```bash   
+  python app.py
+```
+### 執行結果
+![001](https://github.com/user-attachments/assets/77886c6d-b957-4bad-a1ca-2c7aa96e8262)
+![002](https://github.com/user-attachments/assets/89095c5a-bea8-45a4-95ea-b0b7e5c160a0)
 
-   ```bash
-    pip install flask
-
-   ```
+## License
+此專案採用 MIT License 授權，歡迎自由使用與修改。
