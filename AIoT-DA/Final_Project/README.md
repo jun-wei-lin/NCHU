@@ -51,6 +51,7 @@ AIoT-DA/
 ```
 ## Demo
 👉 [點擊此處查看 Demo](https://eefzbzjg62yh54cyzxez5q.streamlit.app/) 
+- [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/1tys0.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 
 ## Video
 🎥 [點擊此處觀看示範影片](https://youtu.be/4Oh9ubYgO8k)
