@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>強化學習 Gridworld</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>強化學習 Gridworld</h1>
+    <form method="post">
+      <label for="dimension">請輸入網格尺寸 (5-9):</label>
+      <input type="number" id="dimension" name="dimension" min="5" max="9" required>
+      <button type="submit">生成網格</button>
+    </form>
+    
+    {% if grid %}
+    <!-- 模式選擇區 -->
+    <div id="modeSelector">
+      <label><input type="radio" name="mode" value="start" checked> 設定起始單元格</label>
+      <label><input type="radio" name="mode" value="end"> 設定結束單元格</label>
+      <label><input type="radio" name="mode" value="obstacle"> 設定障礙物</label>
+    </div>
+    <p>注意：障礙物數量上限為 {{ dimension - 2 }} 個。</p>
+    
+    <!-- 狀態顯示 -->
+    <div id="status">
+      <span id="obstacleCountDisplay">障礙物: 0 / {{ dimension - 2 }}</span>
+    </div>
+    
+    <!-- 網格表格 -->
+    <table id="gridTable" data-dimension="{{ dimension }}">
+      {% for i in range(dimension) %}
+      <tr>
+        {% for j in range(dimension) %}
+        <td data-row="{{ i }}" data-col="{{ j }}" class="empty" onclick="setCell(this)"></td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+    
+    <!-- 控制按鈕 -->
+    <button id="resetButton" onclick="resetGrid()">重設網格</button>
+    <!-- 用於模擬最優策略與顯示最終路徑 -->
+    <button id="optimalPathButton" onclick="findOptimalPath()">找出最終路徑</button>
+    {% endif %}
+  </div>
+  
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
