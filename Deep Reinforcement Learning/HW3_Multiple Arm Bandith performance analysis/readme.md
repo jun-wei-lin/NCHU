@@ -91,3 +91,31 @@ def simulate_mab(algo):
         ...
         # 回饋與估計值更新
         ...
+```
+## 📊 實驗結果圖
+
+比較四種演算法於 500 個時間步內的平均累積獎勵表現：
+
+![output](https://github.com/user-attachments/assets/a4abedb4-58ae-4a22-9eb2-4e5f753f6ead)
+
+
+---
+
+## 🧠 結果分析
+![123](https://github.com/user-attachments/assets/98631f55-a2ab-4df0-abcd-756de57c17f0)
+---
+
+## 📁 專案結構
+ - 📦 HW3-MAB
+ - ┣ 📜 README.md
+ - ┣ 📜 mab_simulation.py
+ - ┣ 📊 mab_result_plot.png
+
+---
+
+## 📚 參考資料
+
+[Introduction to Thompson Sampling: the Bernoulli bandit](https://gdmarmerola.github.io/ts-for-bernoulli-bandit/)
+
+---
+
