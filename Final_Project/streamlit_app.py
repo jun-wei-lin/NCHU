@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pathlib
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 # === Q-Network 定義 === #
@@ -21,8 +22,14 @@ class QNetwork(nn.Module):
         return self.model(x)
 
 # === 輔助函數 === #
-def load_data(path='data/real_discount_data.csv'):
-    return pd.read_csv(path)
+BASE_DIR = pathlib.Path(__file__).parent
+
+def load_data(path=BASE_DIR / 'data' / 'real_discount_data.csv'):
+    try:
+        return pd.read_csv(path)
+    except FileNotFoundError:
+        st.error(f"❌ 找不到資料檔案：{path}")
+        return pd.DataFrame()
 
 def train_simple_qnet(df, episodes=5, batch_size=128):
     state = df[["age", "region", "history"]].values / [60, 3, 1]
